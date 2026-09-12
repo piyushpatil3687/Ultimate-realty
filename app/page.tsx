@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import styles from "./page.module.css";
+import CustomerReviews from "./components/CustomerReviews";
 
 type Property = {
   id: string;
@@ -441,6 +442,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* CUSTOMER REVIEWS */}
+      <CustomerReviews />
 
       {/* CATEGORIES */}
       <section className={styles.categoriesSection}>

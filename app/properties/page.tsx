@@ -147,10 +147,16 @@ export default function PropertiesPage() {
       <header className={styles.header}>
         <div className={styles.container}>
           <Link href="/" className={styles.logo}>
-            <span className={styles.logoMain}>ULTIMATE REALTY</span>
-            <span className={styles.logoSub}>UR • PUNE</span>
+            <img
+             src="/images/ultimate-realty-logo.png"
+              alt="Ultimate Realty UR"
+              className={styles.logoImage}
+            />
+            <span>
+              <span className={styles.logoMain}>ULTIMATE REALTY</span>
+               <span className={styles.logoSub}>UR • PUNE</span>
+            </span>
           </Link>
-
           <nav className={styles.nav}>
             <Link href="/">Home</Link>
             <Link href="/properties" className={styles.activeNav}>
@@ -543,8 +549,15 @@ export default function PropertiesPage() {
           <div className={styles.footerGrid}>
             <div className={styles.footerBrand}>
               <Link href="/" className={styles.logo}>
-                <span className={styles.logoMain}>ULTIMATE REALTY</span>
-                <span className={styles.logoSub}>UR • PUNE</span>
+                <img
+                  src="/images/ultimate-realty-logo.png"
+                  alt="Ultimate Realty UR"
+                  className={styles.logoImage}
+                />
+                <span>
+                  <span className={styles.logoMain}>ULTIMATE REALTY</span>
+                  <span className={styles.logoSub}>UR • PUNE</span>
+                </span>
               </Link>
 
               <p>

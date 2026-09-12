@@ -1,0 +1,76 @@
+.simple-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #171717;
+}
+
+.simple-logo-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  background: #ffffff;
+  padding: 4px;
+  border: 1px solid rgba(20, 20, 20, 0.1);
+  flex-shrink: 0;
+}
+
+.simple-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.simple-logo-text strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+
+.simple-logo-text small {
+  margin-top: 4px;
+  color: #777;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+}
+
+@media (max-width: 760px) {
+  .simple-logo {
+    gap: 8px;
+  }
+
+  .simple-logo-image {
+    width: 42px;
+    height: 42px;
+    padding: 3px;
+  }
+
+  .simple-logo-text strong {
+    font-size: 14px;
+  }
+
+  .simple-logo-text small {
+    font-size: 7px;
+  }
+}
+
+@media (max-width: 430px) {
+  .simple-logo-image {
+    width: 38px;
+    height: 38px;
+  }
+
+  .simple-logo-text strong {
+    font-size: 12px;
+  }
+
+  .simple-logo-text small {
+    font-size: 6px;
+  }
+}

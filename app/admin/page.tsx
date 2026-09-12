@@ -10,6 +10,7 @@ export default function AdminDashboard() {
   const [email, setEmail] = useState("");
   const [propertyCount, setPropertyCount] = useState(0);
   const [enquiryCount, setEnquiryCount] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,8 +43,17 @@ export default function AdminDashboard() {
         head: true,
       });
 
+    const { count: reviews } = await supabase
+      .from("reviews")
+      .select("*", {
+        count: "exact",
+        head: true,
+      });
+
     setPropertyCount(properties || 0);
     setEnquiryCount(enquiries || 0);
+    setReviewCount(reviews || 0);
+
     setLoading(false);
   }
 
@@ -99,6 +109,10 @@ export default function AdminDashboard() {
             Enquiries
           </a>
 
+          <a href="/admin/reviews">
+            Reviews
+          </a>
+
         </nav>
 
         <div className="admin-sidebar-bottom">
@@ -106,6 +120,7 @@ export default function AdminDashboard() {
           <a
             href="/"
             target="_blank"
+            rel="noopener noreferrer"
           >
             View Website ↗
           </a>
@@ -171,6 +186,22 @@ export default function AdminDashboard() {
 
             <p>
               Customer enquiries
+            </p>
+
+          </div>
+
+          <div className="admin-stat-card">
+
+            <span>
+              REVIEWS
+            </span>
+
+            <strong>
+              {reviewCount}
+            </strong>
+
+            <p>
+              Customer reviews
             </p>
 
           </div>
@@ -276,6 +307,27 @@ export default function AdminDashboard() {
 
             </a>
 
+            <a
+              href="/admin/reviews"
+              className="admin-action-card"
+            >
+
+              <span>
+                ★
+              </span>
+
+              <div>
+                <h3>
+                  Manage Reviews
+                </h3>
+
+                <p>
+                  Approve and manage customer reviews.
+                </p>
+              </div>
+
+            </a>
+
           </div>
 
         </section>
@@ -302,8 +354,8 @@ export default function AdminDashboard() {
 
             <p>
               Use the admin panel to manage property listings,
-              update property information and review customer
-              enquiries from one place.
+              update property information, review customer
+              enquiries and manage customer reviews from one place.
             </p>
 
           </div>

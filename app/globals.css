@@ -2914,3 +2914,101 @@ select {
 }
 
 
+/* =========================================================
+   PROPERTY DETAILS - ULTIMATE REALTY LOGO
+   ========================================================= */
+
+.simple-logo {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: auto !important;
+  height: auto !important;
+  text-decoration: none !important;
+  color: #171717 !important;
+  flex-shrink: 0 !important;
+}
+
+.simple-logo-image {
+  width: 48px !important;
+  height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  display: block !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  padding: 4px !important;
+  border: 1px solid rgba(20, 20, 20, 0.1) !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+}
+
+.simple-logo-text {
+  display: flex !important;
+  flex-direction: column !important;
+  width: auto !important;
+}
+
+.simple-logo-text strong {
+  display: block !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.02em !important;
+  white-space: nowrap !important;
+}
+
+.simple-logo-text small {
+  display: block !important;
+  margin-top: 4px !important;
+  color: #777 !important;
+  font-size: 8px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.2em !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 760px) {
+  .simple-logo-image {
+    width: 42px !important;
+    height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    padding: 3px !important;
+  }
+
+  .simple-logo-text strong {
+    font-size: 14px !important;
+  }
+
+  .simple-logo-text small {
+    font-size: 7px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .simple-logo-image {
+    width: 38px !important;
+    height: 38px !important;
+    max-width: 38px !important;
+    max-height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+  }
+
+  .simple-logo-text strong {
+    font-size: 12px !important;
+  }
+
+  .simple-logo-text small {
+    font-size: 6px !important;
+  }
+}

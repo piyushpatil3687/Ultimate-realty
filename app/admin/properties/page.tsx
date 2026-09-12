@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import styles from "./page.module.css";
 
 type Property = {
   id: string;
@@ -16,45 +16,39 @@ type Property = {
   bhk: string | null;
   carpet_area: string | null;
   built_up_area: string | null;
-  description: string | null;
-  amenities: string[] | null;
   images: string[] | null;
+  created_at: string;
 };
 
-const propertyTypes = [
-  "All",
-  "Flat",
-  "Apartment",
-  "Villa",
-  "Plot",
-  "Commercial",
-  "Office",
-  "Shop",
-  "Other",
-];
+export default function AdminPropertiesPage() {
+  const router = useRouter();
 
-const listingTypes = ["All", "Sale", "Rent"];
-
-const bhkOptions = ["All", "1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK"];
-
-export default function PropertiesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  const [search, setSearch] = useState("");
-  const [propertyType, setPropertyType] = useState("All");
-  const [listingType, setListingType] = useState("All");
-  const [bhk, setBhk] = useState("All");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
-    loadProperties();
+    checkAuthAndLoadProperties();
   }, []);
 
-  async function loadProperties() {
+  async function checkAuthAndLoadProperties() {
     setLoading(true);
     setError("");
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      router.replace("/admin/login");
+      return;
+    }
+
+    await loadProperties();
+  }
+
+  async function loadProperties() {
     const { data, error } = await supabase
       .from("properties")
       .select(
@@ -69,16 +63,15 @@ export default function PropertiesPage() {
         bhk,
         carpet_area,
         built_up_area,
-        description,
-        amenities,
-        images
+        images,
+        created_at
       `
       )
       .order("created_at", { ascending: false });
 
     if (error) {
       console.error(error);
-      setError("Unable to load properties. Please try again.");
+      setError("Unable to load properties.");
       setProperties([]);
     } else {
       setProperties((data as Property[]) || []);
@@ -87,52 +80,40 @@ export default function PropertiesPage() {
     setLoading(false);
   }
 
-  const filteredProperties = useMemo(() => {
-    const searchText = search.trim().toLowerCase();
+  async function handleDelete(property: Property) {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${property.title}"?\n\nThis action cannot be undone.`
+    );
 
-    return properties.filter((property) => {
-      const searchableText = [
-        property.title,
-        property.property_type,
-        property.listing_type,
-        property.location,
-        property.city,
-        property.bhk,
-        property.price,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+    if (!confirmed) {
+      return;
+    }
 
-      const matchesSearch =
-        !searchText || searchableText.includes(searchText);
+    setDeletingId(property.id);
+    setError("");
 
-      const matchesType =
-        propertyType === "All" ||
-        property.property_type?.toLowerCase() === propertyType.toLowerCase();
+    const { error } = await supabase
+      .from("properties")
+      .delete()
+      .eq("id", property.id);
 
-      const matchesListing =
-        listingType === "All" ||
-        property.listing_type?.toLowerCase() === listingType.toLowerCase();
+    if (error) {
+      console.error(error);
+      setError(`Unable to delete property: ${error.message}`);
+      setDeletingId(null);
+      return;
+    }
 
-      const matchesBhk =
-        bhk === "All" ||
-        property.bhk?.toLowerCase() === bhk.toLowerCase();
+    setProperties((current) =>
+      current.filter((item) => item.id !== property.id)
+    );
 
-      return (
-        matchesSearch &&
-        matchesType &&
-        matchesListing &&
-        matchesBhk
-      );
-    });
-  }, [properties, search, propertyType, listingType, bhk]);
+    setDeletingId(null);
+  }
 
-  function clearFilters() {
-    setSearch("");
-    setPropertyType("All");
-    setListingType("All");
-    setBhk("All");
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.replace("/admin/login");
   }
 
   function getImage(property: Property) {
@@ -144,333 +125,743 @@ export default function PropertiesPage() {
   }
 
   return (
-    <main className={styles.page}>
-      {/* HEADER */}
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <Link href="/" className={styles.logo}>
-            <span className={styles.logoMain}>ULTIMATE REALTY</span>
-            <span className={styles.logoSub}>UR</span>
+    <div style={styles.page}>
+      {/* SIDEBAR */}
+      <aside style={styles.sidebar}>
+        <div style={styles.brand}>
+          <div style={styles.logoCircle}>
+            <img
+              src="/image/ultimate-realty-logo.png"
+              alt="Ultimate Realty"
+              style={styles.logoImage}
+            />
+          </div>
+
+          <div>
+            <div style={styles.brandName}>ULTIMATE REALTY</div>
+            <div style={styles.brandSub}>ADMIN PANEL</div>
+          </div>
+        </div>
+
+        <nav style={styles.sidebarNav}>
+          <Link href="/admin" style={styles.navItem}>
+            <span>▣</span>
+            Dashboard
           </Link>
 
-          <nav className={styles.navigation}>
-            <Link href="/">Home</Link>
-            <Link href="/properties" className={styles.active}>
-              Properties
-            </Link>
-            <Link href="/about">About Us</Link>
-            <Link href="/services">Services</Link>
-            <Link href="/contact">Contact</Link>
-          </nav>
-
-          <a
-            href="tel:+919067513120"
-            className={styles.headerButton}
+          <Link
+            href="/admin/properties"
+            style={{ ...styles.navItem, ...styles.activeNavItem }}
           >
-            Call Us
-          </a>
+            <span>⌂</span>
+            Properties
+          </Link>
+
+          <Link href="/admin/enquiries" style={styles.navItem}>
+            <span>✉</span>
+            Enquiries
+          </Link>
+
+          <Link href="/admin/reviews" style={styles.navItem}>
+            <span>★</span>
+            Reviews
+          </Link>
+        </nav>
+
+        <div style={styles.sidebarBottom}>
+          <Link href="/" target="_blank" style={styles.viewWebsite}>
+            View Website ↗
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            style={styles.logoutButton}
+          >
+            Logout
+          </button>
         </div>
-      </header>
+      </aside>
 
-      {/* HERO */}
-      <section className={styles.hero}>
-        <div className={styles.heroOverlay}>
-          <p className={styles.eyebrow}>ULTIMATE REALTY UR</p>
-
-          <h1>Find Your Perfect Property</h1>
-
-          <p>
-            Explore premium homes, apartments, villas, plots and
-            commercial properties across Pune.
-          </p>
-        </div>
-      </section>
-
-      {/* FILTER SECTION */}
-      <section className={styles.filterSection}>
-        <div className={styles.filterContainer}>
-          <div className={styles.filterHeading}>
-            <div>
-              <span>PROPERTY SEARCH</span>
-              <h2>Find a Property</h2>
-            </div>
-
-            <p>
-              {filteredProperties.length}{" "}
-              {filteredProperties.length === 1
-                ? "Property"
-                : "Properties"}{" "}
-              Available
+      {/* MAIN */}
+      <main style={styles.main}>
+        {/* TOP BAR */}
+        <header style={styles.topBar}>
+          <div>
+            <p style={styles.pageLabel}>PROPERTY MANAGEMENT</p>
+            <h1 style={styles.pageTitle}>Properties</h1>
+            <p style={styles.pageDescription}>
+              Add, edit and manage all properties displayed on your website.
             </p>
           </div>
 
-          <div className={styles.filters}>
-            <div className={styles.searchBox}>
-              <label>Search</label>
+          <Link href="/admin/properties/new" style={styles.addButton}>
+            + Add New Property
+          </Link>
+        </header>
 
-              <input
-                type="text"
-                placeholder="Search location, property..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+        {/* STATS */}
+        <section style={styles.statsGrid}>
+          <div style={styles.statCard}>
+            <div style={styles.statIcon}>⌂</div>
+            <div>
+              <span style={styles.statLabel}>TOTAL PROPERTIES</span>
+              <strong style={styles.statNumber}>{properties.length}</strong>
             </div>
+          </div>
 
-            <div className={styles.filterBox}>
-              <label>Property Type</label>
-
-              <select
-                value={propertyType}
-                onChange={(e) => setPropertyType(e.target.value)}
-              >
-                {propertyTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
+          <div style={styles.statCard}>
+            <div style={styles.statIcon}>₹</div>
+            <div>
+              <span style={styles.statLabel}>FOR SALE</span>
+              <strong style={styles.statNumber}>
+                {
+                  properties.filter(
+                    (property) =>
+                      property.listing_type?.toLowerCase() === "sale"
+                  ).length
+                }
+              </strong>
             </div>
+          </div>
 
-            <div className={styles.filterBox}>
-              <label>Purpose</label>
-
-              <select
-                value={listingType}
-                onChange={(e) => setListingType(e.target.value)}
-              >
-                {listingTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
+          <div style={styles.statCard}>
+            <div style={styles.statIcon}>↗</div>
+            <div>
+              <span style={styles.statLabel}>FOR RENT</span>
+              <strong style={styles.statNumber}>
+                {
+                  properties.filter(
+                    (property) =>
+                      property.listing_type?.toLowerCase() === "rent"
+                  ).length
+                }
+              </strong>
             </div>
+          </div>
+        </section>
 
-            <div className={styles.filterBox}>
-              <label>BHK</label>
-
-              <select
-                value={bhk}
-                onChange={(e) => setBhk(e.target.value)}
-              >
-                {bhkOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
+        {/* ERROR */}
+        {error && (
+          <div style={styles.errorBox}>
+            <strong>Error</strong>
+            <span>{error}</span>
             <button
               type="button"
-              className={styles.clearButton}
-              onClick={clearFilters}
+              onClick={loadProperties}
+              style={styles.retryButton}
             >
-              Clear
+              Try Again
             </button>
           </div>
-        </div>
-      </section>
+        )}
 
-      {/* PROPERTIES */}
-      <section className={styles.propertiesSection}>
-        <div className={styles.propertiesContainer}>
+        {/* PROPERTY LIST */}
+        <section style={styles.contentCard}>
+          <div style={styles.contentHeader}>
+            <div>
+              <h2 style={styles.contentTitle}>All Properties</h2>
+              <p style={styles.contentSubtitle}>
+                Manage your property listings from here.
+              </p>
+            </div>
+
+            <span style={styles.countBadge}>
+              {properties.length}{" "}
+              {properties.length === 1 ? "Property" : "Properties"}
+            </span>
+          </div>
+
           {loading ? (
-            <div className={styles.statusBox}>
-              <div className={styles.loader}></div>
+            <div style={styles.loadingBox}>
+              <div style={styles.loader}></div>
               <p>Loading properties...</p>
             </div>
-          ) : error ? (
-            <div className={styles.statusBox}>
-              <h3>Something went wrong</h3>
-              <p>{error}</p>
-
-              <button
-                type="button"
-                className={styles.retryButton}
-                onClick={loadProperties}
-              >
-                Try Again
-              </button>
-            </div>
-          ) : filteredProperties.length === 0 ? (
-            <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>⌂</div>
-
-              <h3>No Properties Found</h3>
-
+          ) : properties.length === 0 ? (
+            <div style={styles.emptyBox}>
+              <div style={styles.emptyIcon}>⌂</div>
+              <h3>No Properties Added Yet</h3>
               <p>
-                We could not find any property matching your
-                current search or filters.
+                Start adding your property listings to display them on the
+                website.
               </p>
 
-              <button
-                type="button"
-                className={styles.retryButton}
-                onClick={clearFilters}
+              <Link
+                href="/admin/properties/new"
+                style={styles.emptyAddButton}
               >
-                View All Properties
-              </button>
+                + Add Your First Property
+              </Link>
             </div>
           ) : (
-            <div className={styles.propertyGrid}>
-              {filteredProperties.map((property) => (
-                <article
-                  className={styles.propertyCard}
-                  key={property.id}
-                >
-                  <Link
-                    href={`/properties/${property.id}`}
-                    className={styles.imageWrapper}
-                  >
+            <div style={styles.propertyList}>
+              {properties.map((property) => (
+                <article key={property.id} style={styles.propertyCard}>
+                  {/* IMAGE */}
+                  <div style={styles.imageContainer}>
                     <img
                       src={getImage(property)}
                       alt={property.title}
-                      className={styles.propertyImage}
+                      style={styles.propertyImage}
                     />
 
-                    <div className={styles.imageShade}></div>
-
-                    <span className={styles.listingBadge}>
+                    <span
+                      style={{
+                        ...styles.listingBadge,
+                        background:
+                          property.listing_type?.toLowerCase() === "rent"
+                            ? "#2563eb"
+                            : "#111827",
+                      }}
+                    >
                       {property.listing_type || "Property"}
                     </span>
+                  </div>
 
-                    <span className={styles.viewDetails}>
-                      View Details →
-                    </span>
-                  </Link>
+                  {/* INFORMATION */}
+                  <div style={styles.propertyInfo}>
+                    <div style={styles.propertyTop}>
+                      <div>
+                        <span style={styles.propertyType}>
+                          {property.property_type || "Property"}
+                        </span>
 
-                  <div className={styles.cardContent}>
-                    <p className={styles.propertyType}>
-                      {property.property_type || "Property"}
-                    </p>
+                        <h3 style={styles.propertyTitle}>
+                          {property.title}
+                        </h3>
 
-                    <Link
-                      href={`/properties/${property.id}`}
-                      className={styles.propertyTitle}
-                    >
-                      {property.title}
-                    </Link>
+                        <p style={styles.location}>
+                          📍 {property.location || "Pune"}
+                          {property.city ? `, ${property.city}` : ""}
+                        </p>
+                      </div>
 
-                    <p className={styles.location}>
-                      <span>⌖</span>
-                      {property.location || "Pune"}
-                      {property.city
-                        ? `, ${property.city}`
-                        : ""}
-                    </p>
+                      <div style={styles.priceBlock}>
+                        <span style={styles.priceLabel}>PRICE</span>
+                        <strong>
+                          {property.price || "Price on Request"}
+                        </strong>
+                      </div>
+                    </div>
 
-                    <div className={styles.details}>
+                    {/* DETAILS */}
+                    <div style={styles.detailsRow}>
                       {property.bhk && (
-                        <div>
+                        <div style={styles.detailItem}>
                           <strong>{property.bhk}</strong>
                           <span>BHK</span>
                         </div>
                       )}
 
                       {property.carpet_area && (
-                        <div>
+                        <div style={styles.detailItem}>
                           <strong>{property.carpet_area}</strong>
                           <span>Carpet Area</span>
                         </div>
                       )}
 
                       {property.built_up_area && (
-                        <div>
-                          <strong>
-                            {property.built_up_area}
-                          </strong>
-                          <span>Built-up</span>
+                        <div style={styles.detailItem}>
+                          <strong>{property.built_up_area}</strong>
+                          <span>Built-up Area</span>
                         </div>
                       )}
+
+                      <div style={styles.detailItem}>
+                        <strong>{property.images?.length || 0}</strong>
+                        <span>Photos</span>
+                      </div>
                     </div>
 
-                    <div className={styles.cardFooter}>
-                      <div>
-                        <span className={styles.priceLabel}>
-                          Price
-                        </span>
-
-                        <strong className={styles.price}>
-                          {property.price || "Price on Request"}
-                        </strong>
-                      </div>
-
-                      <a
-                        href={`https://wa.me/919067513120?text=${encodeURIComponent(
-                          `Hello Ultimate Realty UR, I am interested in "${property.title}". Please share more details.`
-                        )}`}
+                    {/* ACTIONS */}
+                    <div style={styles.actions}>
+                      <Link
+                        href={`/properties/${property.id}`}
                         target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.whatsappButton}
-                        onClick={(e) => e.stopPropagation()}
+                        style={styles.viewButton}
                       >
-                        WhatsApp
-                      </a>
+                        👁 View
+                      </Link>
+
+                      <Link
+                        href={`/admin/properties/edit/${property.id}`}
+                        style={styles.editButton}
+                      >
+                        ✎ Edit
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(property)}
+                        disabled={deletingId === property.id}
+                        style={{
+                          ...styles.deleteButton,
+                          opacity:
+                            deletingId === property.id ? 0.6 : 1,
+                          cursor:
+                            deletingId === property.id
+                              ? "not-allowed"
+                              : "pointer",
+                        }}
+                      >
+                        {deletingId === property.id
+                          ? "Deleting..."
+                          : "🗑 Delete"}
+                      </button>
                     </div>
                   </div>
                 </article>
               ))}
             </div>
           )}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className={styles.cta}>
-        <div className={styles.ctaInner}>
-          <div>
-            <span>CAN'T FIND WHAT YOU'RE LOOKING FOR?</span>
-
-            <h2>
-              Let us help you find your
-              <br />
-              dream property.
-            </h2>
-          </div>
-
-          <Link href="/contact" className={styles.ctaButton}>
-            Contact Us →
-          </Link>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className={styles.footer}>
-        <div className={styles.footerInner}>
-          <div>
-            <div className={styles.footerLogo}>
-              ULTIMATE REALTY <span>UR</span>
-            </div>
-
-            <p>
-              Helping you find your perfect property
-              <br />
-              across Pune.
-            </p>
-          </div>
-
-          <div className={styles.footerLinks}>
-            <Link href="/">Home</Link>
-            <Link href="/properties">Properties</Link>
-            <Link href="/about">About Us</Link>
-            <Link href="/contact">Contact</Link>
-          </div>
-
-          <div className={styles.footerContact}>
-            <a href="tel:+919067513120">+91 90675 13120</a>
-            <a href="mailto:ultimaterealty711@gmail.com">
-              ultimaterealty711@gmail.com
-            </a>
-            <p>Ravet, Mukai Chowk, Pune</p>
-          </div>
-        </div>
-
-        <div className={styles.footerBottom}>
-          © {new Date().getFullYear()} Ultimate Realty UR. All
-          Rights Reserved.
-        </div>
-      </footer>
-    </main>
+        </section>
+      </main>
+    </div>
   );
 }
+
+/* =========================
+   INLINE STYLES
+========================= */
+
+const styles: Record<string, React.CSSProperties> = {
+  page: {
+    minHeight: "100vh",
+    background: "#f5f6f8",
+    color: "#111827",
+    display: "flex",
+    fontFamily:
+      "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
+  },
+
+  sidebar: {
+    width: "250px",
+    minHeight: "100vh",
+    background: "#111827",
+    color: "#fff",
+    padding: "24px 16px",
+    display: "flex",
+    flexDirection: "column",
+    position: "sticky",
+    top: 0,
+    alignSelf: "flex-start",
+    boxSizing: "border-box",
+  },
+
+  brand: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    padding: "4px 8px 28px",
+    borderBottom: "1px solid rgba(255,255,255,0.1)",
+  },
+
+  logoCircle: {
+    width: "48px",
+    height: "48px",
+    borderRadius: "50%",
+    background: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    flexShrink: 0,
+  },
+
+  logoImage: {
+    width: "36px",
+    height: "36px",
+    objectFit: "contain",
+    display: "block",
+  },
+
+  brandName: {
+    fontSize: "13px",
+    fontWeight: 800,
+    letterSpacing: "0.05em",
+  },
+
+  brandSub: {
+    marginTop: "3px",
+    fontSize: "10px",
+    color: "#9ca3af",
+    letterSpacing: "0.15em",
+  },
+
+  sidebarNav: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+    marginTop: "28px",
+  },
+
+  navItem: {
+    textDecoration: "none",
+    color: "#cbd5e1",
+    padding: "13px 14px",
+    borderRadius: "8px",
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    fontSize: "14px",
+    fontWeight: 600,
+  },
+
+  activeNavItem: {
+    background: "#fff",
+    color: "#111827",
+  },
+
+  sidebarBottom: {
+    marginTop: "auto",
+    paddingTop: "25px",
+    borderTop: "1px solid rgba(255,255,255,0.1)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  },
+
+  viewWebsite: {
+    color: "#d1d5db",
+    textDecoration: "none",
+    padding: "11px 12px",
+    fontSize: "13px",
+  },
+
+  logoutButton: {
+    border: "1px solid rgba(255,255,255,0.15)",
+    background: "transparent",
+    color: "#fff",
+    padding: "11px 12px",
+    borderRadius: "7px",
+    cursor: "pointer",
+    fontSize: "13px",
+  },
+
+  main: {
+    flex: 1,
+    minWidth: 0,
+    padding: "34px",
+  },
+
+  topBar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: "20px",
+    marginBottom: "28px",
+  },
+
+  pageLabel: {
+    margin: 0,
+    color: "#6b7280",
+    fontSize: "11px",
+    fontWeight: 800,
+    letterSpacing: "0.15em",
+  },
+
+  pageTitle: {
+    margin: "6px 0 4px",
+    fontSize: "32px",
+    lineHeight: 1.1,
+    fontWeight: 800,
+  },
+
+  pageDescription: {
+    margin: 0,
+    color: "#6b7280",
+    fontSize: "14px",
+  },
+
+  addButton: {
+    textDecoration: "none",
+    background: "#111827",
+    color: "#fff",
+    padding: "13px 18px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 700,
+    whiteSpace: "nowrap",
+  },
+
+  statsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gap: "16px",
+    marginBottom: "24px",
+  },
+
+  statCard: {
+    background: "#fff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "12px",
+    padding: "20px",
+    display: "flex",
+    alignItems: "center",
+    gap: "15px",
+  },
+
+  statIcon: {
+    width: "44px",
+    height: "44px",
+    borderRadius: "10px",
+    background: "#f3f4f6",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "20px",
+  },
+
+  statLabel: {
+    display: "block",
+    fontSize: "10px",
+    fontWeight: 800,
+    letterSpacing: "0.08em",
+    color: "#6b7280",
+  },
+
+  statNumber: {
+    display: "block",
+    fontSize: "24px",
+    marginTop: "3px",
+  },
+
+  errorBox: {
+    background: "#fef2f2",
+    border: "1px solid #fecaca",
+    color: "#991b1b",
+    borderRadius: "10px",
+    padding: "14px 16px",
+    marginBottom: "20px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    flexWrap: "wrap",
+  },
+
+  retryButton: {
+    marginLeft: "auto",
+    border: "1px solid #fecaca",
+    background: "#fff",
+    color: "#991b1b",
+    borderRadius: "6px",
+    padding: "7px 12px",
+    cursor: "pointer",
+  },
+
+  contentCard: {
+    background: "#fff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "12px",
+    overflow: "hidden",
+  },
+
+  contentHeader: {
+    padding: "22px 24px",
+    borderBottom: "1px solid #e5e7eb",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "15px",
+  },
+
+  contentTitle: {
+    margin: 0,
+    fontSize: "18px",
+    fontWeight: 800,
+  },
+
+  contentSubtitle: {
+    margin: "5px 0 0",
+    color: "#6b7280",
+    fontSize: "13px",
+  },
+
+  countBadge: {
+    background: "#f3f4f6",
+    color: "#374151",
+    padding: "7px 11px",
+    borderRadius: "20px",
+    fontSize: "12px",
+    fontWeight: 700,
+  },
+
+  loadingBox: {
+    padding: "70px 20px",
+    textAlign: "center",
+    color: "#6b7280",
+  },
+
+  loader: {
+    width: "30px",
+    height: "30px",
+    border: "3px solid #e5e7eb",
+    borderTop: "3px solid #111827",
+    borderRadius: "50%",
+    margin: "0 auto 15px",
+  },
+
+  emptyBox: {
+    padding: "75px 20px",
+    textAlign: "center",
+  },
+
+  emptyIcon: {
+    fontSize: "42px",
+    marginBottom: "12px",
+  },
+
+  emptyAddButton: {
+    display: "inline-block",
+    marginTop: "12px",
+    background: "#111827",
+    color: "#fff",
+    textDecoration: "none",
+    padding: "12px 17px",
+    borderRadius: "7px",
+    fontWeight: 700,
+    fontSize: "13px",
+  },
+
+  propertyList: {
+    display: "flex",
+    flexDirection: "column",
+  },
+
+  propertyCard: {
+    display: "flex",
+    gap: "22px",
+    padding: "22px 24px",
+    borderBottom: "1px solid #e5e7eb",
+  },
+
+  imageContainer: {
+    width: "220px",
+    height: "165px",
+    flexShrink: 0,
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: "9px",
+    background: "#e5e7eb",
+  },
+
+  propertyImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  },
+
+  listingBadge: {
+    position: "absolute",
+    top: "10px",
+    left: "10px",
+    color: "#fff",
+    padding: "5px 9px",
+    borderRadius: "5px",
+    fontSize: "10px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+  },
+
+  propertyInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  propertyTop: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "20px",
+  },
+
+  propertyType: {
+    color: "#6b7280",
+    fontSize: "10px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+  },
+
+  propertyTitle: {
+    margin: "5px 0",
+    fontSize: "20px",
+    fontWeight: 800,
+    lineHeight: 1.2,
+  },
+
+  location: {
+    margin: 0,
+    color: "#6b7280",
+    fontSize: "13px",
+  },
+
+  priceBlock: {
+    textAlign: "right",
+    flexShrink: 0,
+  },
+
+  priceLabel: {
+    display: "block",
+    fontSize: "9px",
+    color: "#9ca3af",
+    fontWeight: 800,
+    letterSpacing: "0.08em",
+    marginBottom: "3px",
+  },
+
+  detailsRow: {
+    display: "flex",
+    gap: "0",
+    marginTop: "18px",
+    borderTop: "1px solid #f0f0f0",
+    borderBottom: "1px solid #f0f0f0",
+    padding: "12px 0",
+  },
+
+  detailItem: {
+    minWidth: "105px",
+    paddingRight: "18px",
+    marginRight: "18px",
+    borderRight: "1px solid #e5e7eb",
+  },
+
+  actions: {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "8px",
+    marginTop: "16px",
+  },
+
+  viewButton: {
+    textDecoration: "none",
+    border: "1px solid #d1d5db",
+    color: "#374151",
+    background: "#fff",
+    padding: "8px 12px",
+    borderRadius: "6px",
+    fontSize: "12px",
+    fontWeight: 700,
+  },
+
+  editButton: {
+    textDecoration: "none",
+    border: "1px solid #111827",
+    color: "#fff",
+    background: "#111827",
+    padding: "8px 14px",
+    borderRadius: "6px",
+    fontSize: "12px",
+    fontWeight: 700,
+  },
+
+  deleteButton: {
+    border: "1px solid #fecaca",
+    color: "#b91c1c",
+    background: "#fff",
+    padding: "8px 12px",
+    borderRadius: "6px",
+    fontSize: "12px",
+    fontWeight: 700,
+  },
+};

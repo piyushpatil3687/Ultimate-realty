@@ -32,11 +32,15 @@ export default function PropertyDetailsPage() {
       <header className="simple-header">
         <div className="container simple-header-inner">
           <a href="/" className="simple-logo">
-            <span>UR</span>
+            <img
+              src="/images/ultimate-realty-logo.png"
+              alt="Ultimate Realty UR"
+              className="simple-logo-image"
+            />
 
-            <div>
-              <strong>ULTIMATE</strong>
-              <small>REALTY</small>
+            <div className="simple-logo-text">
+              <strong>ULTIMATE REALTY</strong>
+              <small>UR • PUNE</small>
             </div>
           </a>
 
@@ -65,11 +69,9 @@ export default function PropertyDetailsPage() {
       <section className="property-details-section">
         <div className="container">
           <div className="property-details-grid">
-
             {/* Gallery */}
 
             <div className="property-gallery">
-
               <div className="main-property-image">
                 <span>PROPERTY MAIN IMAGE</span>
 
@@ -82,16 +84,12 @@ export default function PropertyDetailsPage() {
                 <div>IMAGE 3</div>
                 <div>IMAGE 4</div>
               </div>
-
             </div>
 
             {/* Property Information */}
 
             <div className="property-main-info">
-
-              <p className="listing-type">
-                {property.type}
-              </p>
+              <p className="listing-type">{property.type}</p>
 
               <h1>{property.title}</h1>
 
@@ -99,12 +97,9 @@ export default function PropertyDetailsPage() {
                 📍 {property.location}
               </p>
 
-              <div className="property-price">
-                {property.price}
-              </div>
+              <div className="property-price">{property.price}</div>
 
               <div className="property-specifications">
-
                 <div>
                   <span>BHK</span>
                   <strong>{property.bhk}</strong>
@@ -119,11 +114,9 @@ export default function PropertyDetailsPage() {
                   <span>TYPE</span>
                   <strong>{property.type}</strong>
                 </div>
-
               </div>
 
               <div className="property-action-buttons">
-
                 <a
                   href="tel:+919067513120"
                   className="primary-button"
@@ -139,43 +132,31 @@ export default function PropertyDetailsPage() {
                 >
                   WhatsApp
                 </a>
-
               </div>
-
             </div>
-
           </div>
 
           {/* Description */}
 
           <div className="property-information-grid">
-
             <div>
-
-              <p className="section-label">
-                PROPERTY DESCRIPTION
-              </p>
+              <p className="section-label">PROPERTY DESCRIPTION</p>
 
               <h2>About this property</h2>
 
               <p className="property-description">
                 {property.description}
               </p>
-
             </div>
 
             {/* Enquiry */}
 
             <div className="enquiry-card">
-
-              <p className="section-label">
-                INTERESTED?
-              </p>
+              <p className="section-label">INTERESTED?</p>
 
               <h3>Send an Enquiry</h3>
 
               <form>
-
                 <input
                   type="text"
                   placeholder="Your Name"
@@ -202,42 +183,28 @@ export default function PropertyDetailsPage() {
                 <button type="submit">
                   Send Enquiry →
                 </button>
-
               </form>
-
             </div>
-
           </div>
 
           {/* Amenities */}
 
           <section className="amenities-section">
-
-            <p className="section-label">
-              PROPERTY FEATURES
-            </p>
+            <p className="section-label">PROPERTY FEATURES</p>
 
             <h2>Amenities</h2>
 
             <div className="amenities-grid">
-
               {property.amenities.map((amenity) => (
-                <div key={amenity}>
-                  ✓ {amenity}
-                </div>
+                <div key={amenity}>✓ {amenity}</div>
               ))}
-
             </div>
-
           </section>
 
           {/* Map */}
 
           <section className="map-section">
-
-            <p className="section-label">
-              LOCATION
-            </p>
+            <p className="section-label">LOCATION</p>
 
             <h2>Property Location</h2>
 
@@ -247,25 +214,17 @@ export default function PropertyDetailsPage() {
                 <span>{property.location}, Pune</span>
               </div>
             </div>
-
           </section>
-
         </div>
       </section>
 
       {/* Bottom CTA */}
 
       <section className="property-contact">
-
         <div className="container">
+          <p className="section-label">ULTIMATE REALTY UR</p>
 
-          <p className="section-label">
-            ULTIMATE REALTY UR
-          </p>
-
-          <h2>
-            Interested in this property?
-          </h2>
+          <h2>Interested in this property?</h2>
 
           <p>
             Contact our team for more information,
@@ -273,7 +232,6 @@ export default function PropertyDetailsPage() {
           </p>
 
           <div>
-
             <a href="tel:+919067513120">
               Call 9067513120
             </a>
@@ -281,13 +239,9 @@ export default function PropertyDetailsPage() {
             <a href="https://wa.me/919067513120">
               WhatsApp Us
             </a>
-
           </div>
-
         </div>
-
       </section>
-
     </main>
   );
 }

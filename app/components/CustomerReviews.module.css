@@ -1,0 +1,341 @@
+.reviewsSection {
+  padding: 110px 0;
+  background: #fff;
+}
+
+.container {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  gap: 80px;
+  align-items: end;
+  margin-bottom: 55px;
+}
+
+.label {
+  margin: 0 0 17px;
+  color: #927c57;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+}
+
+.header h2 {
+  margin: 0;
+  color: #222;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(36px, 4vw, 54px);
+  line-height: 1.08;
+  font-weight: 400;
+  letter-spacing: -1px;
+}
+
+.header h2 span {
+  color: #927c57;
+  font-style: italic;
+}
+
+.headerText {
+  margin: 0;
+  color: #686868;
+  font-size: 14px;
+  line-height: 1.85;
+}
+
+.reviewLayout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.reviewList {
+  display: grid;
+  gap: 18px;
+}
+
+.reviewCard {
+  padding: 28px;
+  background: #f7f6f2;
+  border: 1px solid #ebe8e1;
+}
+
+.reviewTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.stars {
+  display: flex;
+  gap: 3px;
+}
+
+.star,
+.starActive {
+  font-size: 15px;
+}
+
+.star {
+  color: #d2cec5;
+}
+
+.starActive {
+  color: #927c57;
+}
+
+.reviewDate {
+  color: #999;
+  font-size: 10px;
+}
+
+.reviewText {
+  margin: 22px 0;
+  color: #555;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.customerName {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.customerName span {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #222;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.customerName strong {
+  color: #333;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.emptyState {
+  min-height: 260px;
+  padding: 45px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #f7f6f2;
+  border: 1px solid #ebe8e1;
+}
+
+.emptyStars {
+  color: #927c57;
+  font-size: 22px;
+  letter-spacing: 4px;
+}
+
+.emptyState h3 {
+  margin: 18px 0 8px;
+  color: #333;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.emptyState p {
+  margin: 0;
+  color: #777;
+  font-size: 12px;
+}
+
+.formCard {
+  padding: 35px;
+  background: #222;
+  color: #fff;
+}
+
+.formHeader {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding-bottom: 28px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.formNumber {
+  color: #d5c39f;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.formHeader h3 {
+  margin: 0 0 7px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  font-weight: 400;
+}
+
+.formHeader p {
+  margin: 0;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.formGroup {
+  margin-bottom: 22px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 9px;
+  color: #ddd;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 15px;
+  border: 1px solid #555;
+  outline: none;
+  background: #2d2d2d;
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  resize: vertical;
+}
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: #888;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  border-color: #927c57;
+}
+
+.ratingSelector {
+  display: flex;
+  gap: 5px;
+}
+
+.ratingStar,
+.ratingStarActive {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 27px;
+  line-height: 1;
+}
+
+.ratingStar {
+  color: #555;
+}
+
+.ratingStarActive {
+  color: #d5c39f;
+}
+
+.ratingText {
+  display: block;
+  margin-top: 8px;
+  color: #999;
+  font-size: 11px;
+}
+
+.formMessage {
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(213, 195, 159, 0.35);
+  color: #d5c39f;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 15px 20px;
+  border: 0;
+  background: #d5c39f;
+  color: #222;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  transition: background 0.2s ease;
+}
+
+.submitButton:hover {
+  background: #fff;
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.formNote {
+  margin: 14px 0 0;
+  color: #888;
+  font-size: 10px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .header {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .reviewLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .reviewsSection {
+    padding: 75px 0;
+  }
+
+  .container {
+    width: min(100% - 30px, 1180px);
+  }
+
+  .reviewCard {
+    padding: 22px;
+  }
+
+  .reviewTop {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .formCard {
+    padding: 25px 20px;
+  }
+
+  .formHeader h3 {
+    font-size: 22px;
+  }
+}
