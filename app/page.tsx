@@ -65,9 +65,29 @@ const services = [
   },
 ];
 
+const growthStats = [
+  {
+    number: "150+",
+    label: "Total Project",
+  },
+  {
+    number: "350+",
+    label: "Total Units Sold",
+  },
+  {
+    number: "1.2m",
+    label: "Total sqft sold",
+  },
+  {
+    number: "300+",
+    label: "Happy Family",
+  },
+];
+
 export default function HomePage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     loadFeaturedProperties();
@@ -91,6 +111,10 @@ export default function HomePage() {
     setLoading(false);
   }
 
+  function closeMenu() {
+    setMenuOpen(false);
+  }
+
   return (
     <main className={styles.page}>
       {/* TOP BAR */}
@@ -100,6 +124,7 @@ export default function HomePage() {
 
           <div className={styles.topLinks}>
             <a href="tel:+919067513120">+91 90675 13120</a>
+
             <a href="mailto:ultimaterealty711@gmail.com">
               ultimaterealty711@gmail.com
             </a>
@@ -110,25 +135,84 @@ export default function HomePage() {
       {/* NAVBAR */}
       <header className={styles.header}>
         <div className={styles.container}>
-          <Link href="/" className={styles.logo}>
-            <span className={styles.logoMain}>ULTIMATE</span>
-            <span className={styles.logoSub}>REALTY UR</span>
+          <Link href="/" className={styles.logo} onClick={closeMenu}>
+            <div className={styles.logoCircle}>
+              <img
+                src="/images/ultimate-realty-logo.png"
+                alt="Ultimate Realty Logo"
+                className={styles.logoImage}
+              />
+            </div>
+
+            <div className={styles.logoText}>
+              <span className={styles.logoMain}>ULTIMATE</span>
+              <span className={styles.logoSub}>REALTY UR</span>
+            </div>
           </Link>
 
+          {/* DESKTOP NAVIGATION */}
           <nav className={styles.nav}>
             <Link href="/" className={styles.active}>
               Home
             </Link>
+
             <Link href="/properties">Properties</Link>
+
             <Link href="/about">About Us</Link>
+
             <Link href="/services">Services</Link>
+
             <Link href="/contact">Contact Us</Link>
           </nav>
 
           <Link href="/properties" className={styles.headerButton}>
             Explore Properties
           </Link>
+
+          {/* MOBILE MENU BUTTON */}
+          <button
+            type="button"
+            className={styles.menuButton}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? "×" : "☰"}
+          </button>
         </div>
+
+        {/* MOBILE NAVIGATION */}
+        {menuOpen && (
+          <div className={styles.mobileMenu}>
+            <Link href="/" className={styles.mobileActive} onClick={closeMenu}>
+              Home
+            </Link>
+
+            <Link href="/properties" onClick={closeMenu}>
+              Properties
+            </Link>
+
+            <Link href="/about" onClick={closeMenu}>
+              About Us
+            </Link>
+
+            <Link href="/services" onClick={closeMenu}>
+              Services
+            </Link>
+
+            <Link href="/contact" onClick={closeMenu}>
+              Contact Us
+            </Link>
+
+            <Link
+              href="/properties"
+              className={styles.mobileExplore}
+              onClick={closeMenu}
+            >
+              Explore Properties
+            </Link>
+          </div>
+        )}
       </header>
 
       {/* HERO */}
@@ -184,10 +268,7 @@ export default function HomePage() {
                 <strong>Sale / Rent</strong>
               </Link>
 
-              <Link
-                href="/properties"
-                className={styles.searchButton}
-              >
+              <Link href="/properties" className={styles.searchButton}>
                 Search Properties
               </Link>
             </div>
@@ -200,7 +281,9 @@ export default function HomePage() {
         <div className={styles.container}>
           <div className={styles.introGrid}>
             <div>
-              <p className={styles.sectionLabel}>WELCOME TO ULTIMATE REALTY</p>
+              <p className={styles.sectionLabel}>
+                WELCOME TO ULTIMATE REALTY
+              </p>
 
               <h2>
                 Real Estate Decisions,
@@ -247,15 +330,12 @@ export default function HomePage() {
           </div>
 
           {loading ? (
-            <div className={styles.loading}>
-              Loading properties...
-            </div>
+            <div className={styles.loading}>Loading properties...</div>
           ) : properties.length === 0 ? (
             <div className={styles.emptyProperties}>
               <h3>Properties Coming Soon</h3>
-              <p>
-                Our latest property listings will appear here.
-              </p>
+
+              <p>Our latest property listings will appear here.</p>
 
               <Link href="/contact" className={styles.primaryButtonDark}>
                 Contact Us
@@ -335,6 +415,33 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* GROWTH IN NUMBERS */}
+      <section className={styles.growthSection}>
+        <div className={styles.container}>
+          <div className={styles.growthHeader}>
+            <p className={styles.growthLabel}>OUR GROWTH</p>
+
+            <h2>
+              Our Growth <span>in Numbers</span>
+            </h2>
+
+            <p>
+              Milestones achieved through trusted real-estate partnerships
+              and customer relationships.
+            </p>
+          </div>
+
+          <div className={styles.growthGrid}>
+            {growthStats.map((stat) => (
+              <div className={styles.growthCard} key={stat.label}>
+                <strong>{stat.number}</strong>
+                <span>{stat.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CATEGORIES */}
       <section className={styles.categoriesSection}>
         <div className={styles.container}>
@@ -380,6 +487,7 @@ export default function HomePage() {
             <div className={styles.whyImage}>
               <div className={styles.whyImageOverlay}>
                 <span>01</span>
+
                 <p>
                   Helping you make
                   <br />
@@ -389,7 +497,9 @@ export default function HomePage() {
             </div>
 
             <div className={styles.whyContent}>
-              <p className={styles.sectionLabel}>WHY ULTIMATE REALTY UR</p>
+              <p className={styles.sectionLabel}>
+                WHY ULTIMATE REALTY UR
+              </p>
 
               <h2>
                 More Than Just
@@ -406,8 +516,10 @@ export default function HomePage() {
               <div className={styles.features}>
                 <div className={styles.feature}>
                   <span>01</span>
+
                   <div>
                     <h3>Local Expertise</h3>
+
                     <p>
                       Strong understanding of Pune's real-estate market and
                       growing locations.
@@ -417,8 +529,10 @@ export default function HomePage() {
 
                 <div className={styles.feature}>
                   <span>02</span>
+
                   <div>
                     <h3>Curated Properties</h3>
+
                     <p>
                       Explore property options selected around your
                       requirements and preferences.
@@ -428,8 +542,10 @@ export default function HomePage() {
 
                 <div className={styles.feature}>
                   <span>03</span>
+
                   <div>
                     <h3>Personal Guidance</h3>
+
                     <p>
                       Get support from property discovery through the next
                       steps of your journey.
@@ -479,6 +595,33 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* MAHARERA */}
+      <section className={styles.reraSection}>
+        <div className={styles.container}>
+          <div className={styles.reraContent}>
+            <p className={styles.sectionLabel}>REGULATORY INFORMATION</p>
+
+            <h2>
+              MahaRERA <span>Registered</span>
+            </h2>
+
+            <p>
+              For transparency and buyer confidence, our MahaRERA registration
+              information is available for reference.
+            </p>
+
+            <div className={styles.reraNumber}>
+              <span>MahaRERA Registration Number</span>
+              <strong>A031262601924</strong>
+            </div>
+
+            <Link href="/maharera" className={styles.primaryButtonDark}>
+              Learn More About MahaRERA
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* BUYER CTA */}
       <section className={styles.buyerSection}>
         <div className={styles.container}>
@@ -520,14 +663,52 @@ export default function HomePage() {
           <div className={styles.footerGrid}>
             <div>
               <Link href="/" className={styles.footerLogo}>
-                <span>ULTIMATE</span>
-                <small>REALTY UR</small>
+                <div className={styles.footerLogoCircle}>
+                  <img
+                    src="/images/ultimate-realty-logo.png"
+                    alt="Ultimate Realty Logo"
+                  />
+                </div>
+
+                <div>
+                  <span>ULTIMATE</span>
+                  <small>REALTY UR</small>
+                </div>
               </Link>
 
               <p className={styles.footerAbout}>
-                Helping home buyers discover the right properties across
-                Pune with trusted real-estate guidance.
+                Helping home buyers discover the right properties across Pune
+                with trusted real-estate guidance.
               </p>
+
+              <div className={styles.socialLinks}>
+                <a
+                  href="https://www.instagram.com/ultimate_realty_/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                >
+                  Instagram
+                </a>
+
+                <a
+                  href="https://www.youtube.com/@UltimateRealty-u8g"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                >
+                  YouTube
+                </a>
+
+                <a
+                  href="https://www.facebook.com/share/17vKpSS8Fo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                >
+                  Facebook
+                </a>
+              </div>
             </div>
 
             <div>
@@ -564,6 +745,10 @@ export default function HomePage() {
                 <br />
                 Pune, Maharashtra
               </p>
+
+              <p className={styles.footerRera}>
+                MahaRERA: A031262601924
+              </p>
             </div>
           </div>
 
@@ -577,6 +762,17 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* FLOATING WHATSAPP */}
+      <a
+        href="https://wa.me/919067513120"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={styles.whatsappButton}
+        aria-label="Chat on WhatsApp"
+      >
+        <span>WhatsApp</span>
+      </a>
     </main>
   );
 }

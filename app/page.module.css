@@ -47,10 +47,10 @@
 ========================= */
 
 .header {
-  background: rgba(255, 255, 255, 0.97);
+  background: rgba(255, 255, 255, 0.98);
   border-bottom: 1px solid #e8e5de;
   position: relative;
-  z-index: 10;
+  z-index: 100;
 }
 
 .header .container {
@@ -61,28 +61,58 @@
   gap: 30px;
 }
 
+/* LOGO */
+
 .logo {
   color: #222;
   text-decoration: none;
   display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 190px;
+}
+
+.logoCircle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid #dedbd3;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.logoImage {
+  width: 43px;
+  height: 43px;
+  object-fit: contain;
+  display: block;
+}
+
+.logoText {
+  display: flex;
   flex-direction: column;
   line-height: 1;
-  min-width: 150px;
 }
 
 .logoMain {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 24px;
-  letter-spacing: 3px;
+  font-size: 20px;
+  letter-spacing: 2.5px;
 }
 
 .logoSub {
-  margin-top: 7px;
+  margin-top: 6px;
   font-size: 8px;
-  letter-spacing: 5px;
+  letter-spacing: 3.5px;
   color: #927c57;
   font-weight: 700;
 }
+
+/* DESKTOP NAV */
 
 .nav {
   display: flex;
@@ -121,6 +151,8 @@
   width: 100%;
 }
 
+/* HEADER BUTTON */
+
 .headerButton {
   display: inline-flex;
   align-items: center;
@@ -138,6 +170,26 @@
 
 .headerButton:hover {
   background: #927c57;
+}
+
+/* MOBILE MENU BUTTON */
+
+.menuButton {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #dedbd3;
+  background: #fff;
+  color: #222;
+  font-size: 27px;
+  line-height: 1;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileMenu {
+  display: none;
 }
 
 /* =========================
@@ -358,7 +410,9 @@
 .categoriesSection h2,
 .whyContent h2,
 .servicesSection h2,
-.buyerSection h2 {
+.buyerSection h2,
+.growthSection h2,
+.reraSection h2 {
   margin: 0;
   color: #222;
   font-family: Georgia, "Times New Roman", serif;
@@ -373,7 +427,9 @@
 .categoriesSection h2 span,
 .whyContent h2 span,
 .servicesSection h2 span,
-.buyerSection h2 span {
+.buyerSection h2 span,
+.growthSection h2 span,
+.reraSection h2 span {
   color: #927c57;
   font-style: italic;
 }
@@ -593,6 +649,87 @@
 
 .primaryButtonDark:hover {
   background: #927c57;
+}
+
+/* =========================
+   GROWTH IN NUMBERS
+========================= */
+
+.growthSection {
+  padding: 105px 0;
+  background: #0e304b;
+  color: #fff;
+}
+
+.growthHeader {
+  max-width: 750px;
+  margin: 0 auto 55px;
+  text-align: center;
+}
+
+.growthLabel {
+  margin: 0 0 16px;
+  color: #d5c39f;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+}
+
+.growthSection h2 {
+  color: #fff;
+}
+
+.growthSection h2 span {
+  color: #d5c39f;
+}
+
+.growthHeader > p:last-child {
+  max-width: 650px;
+  margin: 20px auto 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.growthGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+}
+
+.growthCard {
+  min-height: 220px;
+  padding: 35px 25px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease;
+}
+
+.growthCard:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.growthCard strong {
+  color: #fff;
+  font-size: clamp(32px, 4vw, 50px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.growthCard span {
+  margin-top: 25px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 /* =========================
@@ -830,6 +967,54 @@
 }
 
 /* =========================
+   MAHARERA
+========================= */
+
+.reraSection {
+  padding: 100px 0;
+  background: #f7f6f2;
+}
+
+.reraContent {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.reraContent > p:not(.sectionLabel) {
+  max-width: 650px;
+  margin: 22px auto 0;
+  color: #707070;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.reraNumber {
+  margin: 35px auto;
+  padding: 25px;
+  max-width: 500px;
+  background: #fff;
+  border: 1px solid #e4e0d8;
+}
+
+.reraNumber span {
+  display: block;
+  color: #777;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.reraNumber strong {
+  display: block;
+  margin-top: 10px;
+  color: #222;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
+  letter-spacing: 1px;
+}
+
+/* =========================
    BUYER CTA
 ========================= */
 
@@ -889,22 +1074,47 @@
 
 .footerLogo {
   display: inline-flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   color: #fff;
   text-decoration: none;
 }
 
+.footerLogoCircle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.footerLogoCircle img {
+  width: 39px;
+  height: 39px;
+  object-fit: contain;
+  display: block;
+}
+
+.footerLogo > div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
 .footerLogo span {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 25px;
-  letter-spacing: 3px;
+  font-size: 21px;
+  letter-spacing: 2.5px;
 }
 
 .footerLogo small {
   margin-top: 6px;
   color: #b49c72;
   font-size: 8px;
-  letter-spacing: 4px;
+  letter-spacing: 3px;
 }
 
 .footerAbout {
@@ -947,6 +1157,35 @@
   line-height: 1.7;
 }
 
+.footerRera {
+  color: #b49c72 !important;
+  margin-top: 5px !important;
+}
+
+.socialLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.socialLinks a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid #444;
+  color: #aaa;
+  font-size: 10px;
+  transition: all 0.2s ease;
+}
+
+.socialLinks a:hover {
+  border-color: #b49c72;
+  color: #d5c39f;
+}
+
 .footerBottom {
   padding-top: 22px;
   border-top: 1px solid #3a3a3a;
@@ -955,6 +1194,41 @@
   gap: 20px;
   color: #777;
   font-size: 10px;
+}
+
+/* =========================
+   WHATSAPP
+========================= */
+
+.whatsappButton {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.whatsappButton:hover {
+  transform: translateY(-4px);
+}
+
+.whatsappButton span {
+  font-size: 0;
+}
+
+.whatsappButton span::before {
+  content: "☎";
+  font-size: 24px;
 }
 
 /* =========================
@@ -994,6 +1268,10 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .growthGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .whyGrid {
     gap: 45px;
   }
@@ -1019,19 +1297,85 @@
 
   .header .container {
     min-height: 72px;
+    gap: 12px;
+  }
+
+  .logo {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .logoCircle {
+    width: 44px;
+    height: 44px;
+  }
+
+  .logoImage {
+    width: 36px;
+    height: 36px;
   }
 
   .logoMain {
-    font-size: 20px;
+    font-size: 17px;
+    letter-spacing: 2px;
   }
 
   .logoSub {
     font-size: 7px;
+    letter-spacing: 2.5px;
   }
 
   .nav {
     display: none;
   }
+
+  .headerButton {
+    display: none;
+  }
+
+  .menuButton {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  /* MOBILE MENU */
+
+  .mobileMenu {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-top: 1px solid #e8e5de;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .mobileMenu a {
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid #eeeae2;
+    color: #444;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .mobileMenu a:hover,
+  .mobileMenu .mobileActive {
+    color: #927c57;
+    background: #faf9f6;
+  }
+
+  .mobileMenu .mobileExplore {
+    margin: 14px 15px 15px;
+    min-height: 48px;
+    justify-content: center;
+    background: #222;
+    color: #fff;
+    border: 0;
+  }
+
+  /* HERO */
 
   .hero {
     min-height: 730px;
@@ -1089,11 +1433,15 @@
     min-height: 55px;
   }
 
+  /* SECTIONS */
+
   .introSection,
   .propertiesSection,
   .categoriesSection,
   .whySection,
-  .servicesSection {
+  .servicesSection,
+  .growthSection,
+  .reraSection {
     padding: 75px 0;
   }
 
@@ -1111,6 +1459,8 @@
     margin-top: 20px;
   }
 
+  /* PROPERTIES */
+
   .propertyGrid {
     grid-template-columns: 1fr;
   }
@@ -1118,6 +1468,32 @@
   .propertyImageWrap {
     height: 230px;
   }
+
+  /* GROWTH */
+
+  .growthHeader {
+    margin-bottom: 40px;
+  }
+
+  .growthGrid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .growthCard {
+    min-height: 180px;
+  }
+
+  .growthCard strong {
+    font-size: 40px;
+  }
+
+  .growthCard span {
+    margin-top: 15px;
+    font-size: 14px;
+  }
+
+  /* CATEGORIES */
 
   .categoryGrid {
     grid-template-columns: 1fr;
@@ -1127,6 +1503,8 @@
     min-height: 200px;
   }
 
+  /* WHY */
+
   .whyGrid {
     grid-template-columns: 1fr;
     gap: 45px;
@@ -1135,6 +1513,8 @@
   .whyImage {
     min-height: 440px;
   }
+
+  /* SERVICES */
 
   .servicesGrid {
     grid-template-columns: 1fr;
@@ -1148,9 +1528,23 @@
     margin-top: 45px;
   }
 
+  /* RERA */
+
+  .reraNumber {
+    padding: 22px 15px;
+  }
+
+  .reraNumber strong {
+    font-size: 22px;
+  }
+
+  /* CTA */
+
   .buyerSection {
     padding: 80px 0;
   }
+
+  /* FOOTER */
 
   .footer {
     padding-top: 55px;
@@ -1163,5 +1557,14 @@
 
   .footerBottom {
     flex-direction: column;
+  }
+
+  /* WHATSAPP */
+
+  .whatsappButton {
+    right: 16px;
+    bottom: 16px;
+    width: 54px;
+    height: 54px;
   }
 }
