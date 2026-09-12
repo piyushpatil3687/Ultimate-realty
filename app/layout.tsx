@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Chatbot from "./components/Chatbot";
+import ChatbotVisibility from "./components/ChatbotVisibility";
 
 export const metadata: Metadata = {
   title: "Ultimate Realty | Pune",
@@ -17,7 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {children}
-        <Chatbot />
+        <ChatbotVisibility />
       </body>
     </html>
   );
