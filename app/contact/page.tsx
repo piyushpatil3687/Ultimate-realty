@@ -109,8 +109,15 @@ export default function ContactPage() {
       <header className={styles.header}>
         <div className={styles.container}>
           <Link href="/" className={styles.logo}>
-            <span className={styles.logoMain}>ULTIMATE</span>
-            <span className={styles.logoSub}>REALTY UR</span>
+            <img
+              src="/images/ultimate-realty-logo.png"
+              alt="Ultimate Realty UR"
+              className={styles.logoImage}
+            />
+            <span>
+              <span className={styles.logoMain}>ULTIMATE REALTY</span>
+              <span className={styles.logoSub}>UR • PUNE</span>
+            </span>  
           </Link>
 
           <nav className={styles.nav}>

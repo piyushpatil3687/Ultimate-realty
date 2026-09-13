@@ -137,19 +137,19 @@ export default function AdminReviewsPage() {
     <div className={styles.page}>
       {/* Sidebar */}
       <aside className={styles.sidebar}>
-        <div className={styles.brand}>
+       <a href="/admin" className={styles.brand}>
           <div className={styles.logoCircle}>
             <img
-              src="/image/ultimate-realty-logo.png"
-              alt="Ultimate Realty"
+              src="/images/ultimate-realty-logo.png"
+              alt="Ultimate Realty UR"
             />
           </div>
 
           <div>
-            <h2>Ultimate Realty</h2>
-            <span>ADMIN PANEL</span>
+            <h2>ULTIMATE REALTY</h2>
+            <span>UR • ADMIN</span>
           </div>
-        </div>
+        </a>
 
         <nav className={styles.navigation}>
           <button onClick={() => router.push("/admin")}>

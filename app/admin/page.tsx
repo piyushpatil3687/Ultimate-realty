@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import styles from "./page.module.css";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -66,66 +68,88 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <main className="admin-loading">
-        <p>Loading Ultimate Realty Admin...</p>
+      <main className={styles.loading}>
+        <div className={styles.loadingBox}>
+          <div className={styles.loadingLogo}>
+            <img
+              src="/images/ultimate-realty-logo.png"
+              alt="Ultimate Realty UR"
+            />
+          </div>
+          <p>Loading Ultimate Realty Admin...</p>
+        </div>
       </main>
     );
   }
 
   return (
-    <main className="admin-dashboard">
+    <main className={styles.dashboard}>
 
-      {/* Sidebar */}
+      {/* SIDEBAR */}
+      <aside className={styles.sidebar}>
 
-      <aside className="admin-sidebar">
-
-        <div className="admin-brand">
-          <span>UR</span>
-
-          <div>
-            <strong>ULTIMATE</strong>
-            <small>REALTY</small>
+        <Link href="/admin" className={styles.brand}>
+          <div className={styles.logoCircle}>
+            <img
+              src="/images/ultimate-realty-logo.png"
+              alt="Ultimate Realty UR"
+            />
           </div>
-        </div>
 
-        <div className="admin-sidebar-label">
+          <div className={styles.brandText}>
+            <strong>ULTIMATE REALTY</strong>
+            <span>UR • ADMIN</span>
+          </div>
+        </Link>
+
+        <div className={styles.sidebarDivider} />
+
+        <div className={styles.sidebarLabel}>
           ADMIN PANEL
         </div>
 
-        <nav className="admin-navigation">
+        <nav className={styles.navigation}>
 
-          <a
+          <Link
             href="/admin"
-            className="active"
+            className={`${styles.navLink} ${styles.active}`}
           >
-            Dashboard
-          </a>
+            <span className={styles.navIcon}>▣</span>
+            <span>Dashboard</span>
+          </Link>
 
-          <a href="/admin/properties">
-            Properties
-          </a>
+          <Link href="/admin/properties" className={styles.navLink}>
+            <span className={styles.navIcon}>⌂</span>
+            <span>Properties</span>
+          </Link>
 
-          <a href="/admin/enquiries">
-            Enquiries
-          </a>
+          <Link href="/admin/enquiries" className={styles.navLink}>
+            <span className={styles.navIcon}>≡</span>
+            <span>Enquiries</span>
+          </Link>
 
-          <a href="/admin/reviews">
-            Reviews
-          </a>
+          <Link href="/admin/reviews" className={styles.navLink}>
+            <span className={styles.navIcon}>★</span>
+            <span>Reviews</span>
+          </Link>
 
         </nav>
 
-        <div className="admin-sidebar-bottom">
+        <div className={styles.sidebarBottom}>
 
-          <a
+          <Link
             href="/"
             target="_blank"
             rel="noopener noreferrer"
+            className={styles.websiteLink}
           >
             View Website ↗
-          </a>
+          </Link>
 
-          <button onClick={handleLogout}>
+          <button
+            onClick={handleLogout}
+            className={styles.logoutButton}
+          >
             Logout
           </button>
 
@@ -133,231 +157,154 @@ export default function AdminDashboard() {
 
       </aside>
 
-      {/* Main Dashboard */}
 
-      <section className="admin-content">
+      {/* MAIN CONTENT */}
+      <section className={styles.content}>
 
-        <header className="admin-topbar">
+        {/* TOP BAR */}
+        <header className={styles.topbar}>
 
           <div>
-            <p>ADMINISTRATION</p>
+            <p className={styles.eyebrow}>
+              ADMINISTRATION
+            </p>
 
             <h1>
               Dashboard
             </h1>
           </div>
 
-          <div className="admin-user">
+          <div className={styles.userBox}>
             <span>Logged in as</span>
             <strong>{email}</strong>
           </div>
 
         </header>
 
-        {/* Stats */}
 
-        <section className="admin-stats">
+        {/* STATS */}
+        <section className={styles.stats}>
 
-          <div className="admin-stat-card">
-
-            <span>
-              PROPERTIES
-            </span>
-
-            <strong>
-              {propertyCount}
-            </strong>
-
-            <p>
-              Total listed properties
-            </p>
-
+          <div className={styles.statCard}>
+            <p>PROPERTIES</p>
+            <strong>{propertyCount}</strong>
+            <span>Total listed properties</span>
           </div>
 
-          <div className="admin-stat-card">
-
-            <span>
-              ENQUIRIES
-            </span>
-
-            <strong>
-              {enquiryCount}
-            </strong>
-
-            <p>
-              Customer enquiries
-            </p>
-
+          <div className={styles.statCard}>
+            <p>ENQUIRIES</p>
+            <strong>{enquiryCount}</strong>
+            <span>Customer enquiries</span>
           </div>
 
-          <div className="admin-stat-card">
-
-            <span>
-              REVIEWS
-            </span>
-
-            <strong>
-              {reviewCount}
-            </strong>
-
-            <p>
-              Customer reviews
-            </p>
-
+          <div className={styles.statCard}>
+            <p>REVIEWS</p>
+            <strong>{reviewCount}</strong>
+            <span>Customer reviews</span>
           </div>
 
-          <div className="admin-stat-card">
-
-            <span>
-              STATUS
-            </span>
-
-            <strong>
-              Active
-            </strong>
-
-            <p>
-              Website administration
-            </p>
-
+          <div className={styles.statCard}>
+            <p>STATUS</p>
+            <strong>Active</strong>
+            <span>Website administration</span>
           </div>
 
         </section>
 
-        {/* Quick Actions */}
 
-        <section className="admin-section">
+        {/* QUICK ACTIONS */}
+        <section className={styles.quickSection}>
 
-          <div className="admin-section-heading">
-
-            <div>
-              <p>
-                QUICK ACTIONS
-              </p>
-
-              <h2>
-                Manage Ultimate Realty
-              </h2>
-            </div>
-
+          <div className={styles.sectionHeader}>
+            <p>QUICK ACTIONS</p>
+            <h2>Manage Ultimate Realty</h2>
           </div>
 
-          <div className="admin-actions">
+          <div className={styles.actionsGrid}>
 
-            <a
+            <Link
               href="/admin/properties/new"
-              className="admin-action-card"
+              className={styles.actionCard}
             >
-
-              <span>
-                +
-              </span>
+              <div className={styles.actionIcon}>+</div>
 
               <div>
-                <h3>
-                  Add Property
-                </h3>
-
-                <p>
-                  Add a new property listing.
-                </p>
+                <h3>Add Property</h3>
+                <p>Add a new property listing.</p>
               </div>
 
-            </a>
+              <span className={styles.actionArrow}>→</span>
+            </Link>
 
-            <a
+
+            <Link
               href="/admin/properties"
-              className="admin-action-card"
+              className={styles.actionCard}
             >
-
-              <span>
-                →
-              </span>
+              <div className={styles.actionIcon}>⌂</div>
 
               <div>
-                <h3>
-                  Manage Properties
-                </h3>
-
-                <p>
-                  Edit and manage existing listings.
-                </p>
+                <h3>Manage Properties</h3>
+                <p>Edit and manage existing listings.</p>
               </div>
 
-            </a>
+              <span className={styles.actionArrow}>→</span>
+            </Link>
 
-            <a
+
+            <Link
               href="/admin/enquiries"
-              className="admin-action-card"
+              className={styles.actionCard}
             >
-
-              <span>
-                ≡
-              </span>
+              <div className={styles.actionIcon}>≡</div>
 
               <div>
-                <h3>
-                  View Enquiries
-                </h3>
-
-                <p>
-                  Review customer enquiries.
-                </p>
+                <h3>View Enquiries</h3>
+                <p>Review customer enquiries.</p>
               </div>
 
-            </a>
+              <span className={styles.actionArrow}>→</span>
+            </Link>
 
-            <a
+
+            <Link
               href="/admin/reviews"
-              className="admin-action-card"
+              className={styles.actionCard}
             >
-
-              <span>
-                ★
-              </span>
+              <div className={styles.actionIcon}>★</div>
 
               <div>
-                <h3>
-                  Manage Reviews
-                </h3>
-
-                <p>
-                  Approve and manage customer reviews.
-                </p>
+                <h3>Manage Reviews</h3>
+                <p>Approve and manage customer reviews.</p>
               </div>
 
-            </a>
+              <span className={styles.actionArrow}>→</span>
+            </Link>
 
           </div>
 
         </section>
 
-        {/* Information */}
 
-        <section className="admin-info">
+        {/* INFORMATION */}
+        <section className={styles.infoSection}>
 
           <div>
-
-            <p>
-              ULTIMATE REALTY UR
-            </p>
+            <p>ULTIMATE REALTY UR</p>
 
             <h2>
               Property management
               <br />
               made simple.
             </h2>
-
           </div>
 
-          <div>
-
+          <div className={styles.infoText}>
             <p>
               Use the admin panel to manage property listings,
               update property information, review customer
               enquiries and manage customer reviews from one place.
             </p>
-
           </div>
 
         </section>

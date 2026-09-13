@@ -72,9 +72,7 @@ export default function AdminEnquiries() {
       "Are you sure you want to delete this enquiry?\n\nThis action cannot be undone."
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     setDeletingId(id);
 
@@ -86,9 +84,7 @@ export default function AdminEnquiries() {
     if (error) {
       console.error("Delete enquiry error:", error);
 
-      alert(
-        `Unable to delete enquiry.\n\n${error.message}`
-      );
+      alert(`Unable to delete enquiry.\n\n${error.message}`);
 
       setDeletingId(null);
       return;
@@ -106,7 +102,7 @@ export default function AdminEnquiries() {
   function getInitials(name: string) {
     if (!name) return "U";
 
-    const parts = name.trim().split(" ");
+    const parts = name.trim().split(/\s+/);
 
     if (parts.length === 1) {
       return parts[0].charAt(0).toUpperCase();
@@ -136,9 +132,7 @@ export default function AdminEnquiries() {
   }
 
   function getMessage(enquiry: Enquiry) {
-    if (!enquiry.requirement) {
-      return "";
-    }
+    if (!enquiry.requirement) return "";
 
     if (enquiry.requirement.includes("Message:")) {
       return enquiry.requirement
@@ -169,7 +163,8 @@ export default function AdminEnquiries() {
 
     window.open(
       `https://wa.me/${whatsappNumber}`,
-      "_blank"
+      "_blank",
+      "noopener,noreferrer"
     );
   }
 
@@ -181,86 +176,99 @@ export default function AdminEnquiries() {
 
   if (loading) {
     return (
-      <main className="admin-loading">
+      <main className={styles.loadingPage}>
+        <div className={styles.loadingSpinner}></div>
         <p>Loading enquiries...</p>
       </main>
     );
   }
 
   return (
-    <main className="admin-dashboard">
-
+    <div className={styles.page}>
       {/* ================= SIDEBAR ================= */}
 
-      <aside className="admin-sidebar">
-
-        <div className="admin-brand">
-          <span>UR</span>
-
-          <div>
-            <strong>ULTIMATE</strong>
-            <small>REALTY</small>
+      <aside className={styles.sidebar}>
+        <a href="/admin" className={styles.adminBrand}>
+          <div className={styles.adminLogoCircle}>
+            <img
+              src="/images/ultimate-realty-logo.png"
+              alt="Ultimate Realty UR"
+              className={styles.adminLogo}
+            />
           </div>
-        </div>
 
-        <div className="admin-sidebar-label">
+          <div className={styles.adminBrandText}>
+            <strong>ULTIMATE REALTY</strong>
+            <small>UR • ADMIN</small>
+          </div>
+        </a>
+
+        <div className={styles.sidebarLabel}>
           ADMIN PANEL
         </div>
 
-        <nav className="admin-navigation">
-
-          <a href="/admin">
+        <nav className={styles.navigation}>
+          <a href="/admin" className={styles.navItem}>
+            <span>▣</span>
             Dashboard
           </a>
 
-          <a href="/admin/properties">
+          <a
+            href="/admin/properties"
+            className={styles.navItem}
+          >
+            <span>⌂</span>
             Properties
           </a>
 
           <a
             href="/admin/enquiries"
-            className="active"
+            className={`${styles.navItem} ${styles.activeNav}`}
           >
+            <span>✉</span>
             Enquiries
           </a>
 
+          <a
+            href="/admin/reviews"
+            className={styles.navItem}
+          >
+            <span>★</span>
+            Reviews
+          </a>
         </nav>
 
-        <div className="admin-sidebar-bottom">
-
+        <div className={styles.sidebarBottom}>
           <a
             href="/"
             target="_blank"
             rel="noreferrer"
+            className={styles.websiteButton}
           >
             View Website ↗
           </a>
 
           <button
+            type="button"
+            className={styles.logoutButton}
             onClick={async () => {
               await supabase.auth.signOut();
-
               router.replace("/admin/login");
               router.refresh();
             }}
           >
             Logout
           </button>
-
         </div>
-
       </aside>
 
-      {/* ================= MAIN CONTENT ================= */}
+      {/* ================= MAIN ================= */}
 
-      <section className="admin-content">
-
-        {/* PAGE HEADER */}
+      <main className={styles.main}>
+        {/* HEADER */}
 
         <header className={styles.header}>
-
           <div>
-
             <p className={styles.eyebrow}>
               LEAD MANAGEMENT
             </p>
@@ -270,18 +278,17 @@ export default function AdminEnquiries() {
             </h1>
 
             <p className={styles.subtitle}>
-              Manage customer enquiries and follow up
-              with potential property buyers and tenants.
+              Manage customer enquiries and follow up with
+              potential property buyers and tenants.
             </p>
-
           </div>
 
           <button
+            type="button"
             className={styles.refreshButton}
             onClick={loadEnquiries}
             disabled={refreshing}
           >
-
             <span
               className={
                 refreshing ? styles.spinning : ""
@@ -290,292 +297,186 @@ export default function AdminEnquiries() {
               ↻
             </span>
 
-            {refreshing
-              ? "Refreshing..."
-              : "Refresh"}
-
+            {refreshing ? "Refreshing..." : "Refresh"}
           </button>
-
         </header>
 
-        {/* ================= SUMMARY CARDS ================= */}
+        {/* SUMMARY */}
 
         <section className={styles.summaryGrid}>
-
-          {/* TOTAL */}
-
           <div className={styles.summaryCard}>
-
             <div className={styles.summaryIcon}>
               ◉
             </div>
 
             <div>
-
-              <span>
-                Total Enquiries
-              </span>
-
-              <strong>
-                {enquiries.length}
-              </strong>
-
+              <span>Total Enquiries</span>
+              <strong>{enquiries.length}</strong>
             </div>
-
           </div>
 
-          {/* PROPERTY LEADS */}
-
           <div className={styles.summaryCard}>
-
             <div className={styles.summaryIcon}>
               ↗
             </div>
 
             <div>
-
-              <span>
-                Property Leads
-              </span>
-
+              <span>Property Leads</span>
               <strong>
                 {
                   enquiries.filter(
-                    (item) =>
-                      item.property_type
+                    (item) => item.property_type
                   ).length
                 }
               </strong>
-
             </div>
-
           </div>
 
-          {/* CONTACTABLE */}
-
           <div className={styles.summaryCard}>
-
             <div className={styles.summaryIcon}>
               ☎
             </div>
 
             <div>
-
-              <span>
-                Contactable Leads
-              </span>
-
+              <span>Contactable Leads</span>
               <strong>
                 {
                   enquiries.filter(
-                    (item) =>
-                      item.phone
+                    (item) => item.phone
                   ).length
                 }
               </strong>
-
             </div>
-
           </div>
-
         </section>
 
-        {/* ================= ERROR ================= */}
+        {/* ERROR */}
 
         {error && (
-
           <section className={styles.errorBox}>
-
             <div>
-
               <strong>
                 Unable to load enquiries
               </strong>
 
-              <p>
-                {error}
-              </p>
-
+              <p>{error}</p>
             </div>
 
-            <button onClick={loadEnquiries}>
+            <button
+              type="button"
+              onClick={loadEnquiries}
+            >
               Try Again
             </button>
-
           </section>
-
         )}
 
-        {/* ================= ENQUIRIES ================= */}
+        {/* CUSTOMER LEADS */}
 
         {!error && (
-
           <section className={styles.enquiriesSection}>
-
             <div className={styles.sectionHeader}>
-
               <div>
-
                 <span className={styles.sectionLabel}>
                   CUSTOMER LEADS
                 </span>
 
                 <h2>
-
                   {enquiries.length}{" "}
-
                   {enquiries.length === 1
                     ? "Enquiry"
                     : "Enquiries"}
-
                 </h2>
-
               </div>
 
               <span className={styles.liveBadge}>
                 ● Live
               </span>
-
             </div>
 
-            {/* EMPTY STATE */}
+            {/* EMPTY */}
 
             {enquiries.length === 0 ? (
-
               <div className={styles.emptyState}>
-
                 <div className={styles.emptyIcon}>
                   ✉
                 </div>
 
-                <h3>
-                  No enquiries yet
-                </h3>
+                <h3>No enquiries yet</h3>
 
                 <p>
-                  Customer enquiries submitted
-                  through your website will appear
-                  here.
+                  Customer enquiries submitted through
+                  your website will appear here.
                 </p>
-
               </div>
-
             ) : (
-
-              /* ENQUIRY LIST */
-
               <div className={styles.enquiryList}>
+                {enquiries.map((enquiry, index) => {
+                  const message =
+                    getMessage(enquiry);
 
-                {enquiries.map(
-                  (enquiry, index) => {
+                  return (
+                    <article
+                      key={enquiry.id}
+                      className={styles.enquiryCard}
+                    >
+                      {/* CARD HEADER */}
 
-                    const message =
-                      getMessage(enquiry);
+                      <div className={styles.cardHeader}>
+                        <div className={styles.customerInfo}>
+                          <div className={styles.avatar}>
+                            {getInitials(
+                              enquiry.name
+                            )}
+                          </div>
 
-                    return (
-
-                      <article
-                        key={enquiry.id}
-                        className={
-                          styles.enquiryCard
-                        }
-                      >
-
-                        {/* ================= CARD HEADER ================= */}
-
-                        <div
-                          className={
-                            styles.cardHeader
-                          }
-                        >
-
-                          <div
-                            className={
-                              styles.customerInfo
-                            }
-                          >
-
-                            <div
-                              className={
-                                styles.avatar
-                              }
-                            >
-                              {getInitials(
-                                enquiry.name
+                          <div>
+                            <div className={styles.leadNumber}>
+                              LEAD #
+                              {String(index + 1).padStart(
+                                2,
+                                "0"
                               )}
                             </div>
 
-                            <div>
-
-                              <div
-                                className={
-                                  styles.leadNumber
-                                }
-                              >
-                                LEAD #
-                                {String(
-                                  index + 1
-                                ).padStart(2, "0")}
-                              </div>
-
-                              <h3>
-                                {enquiry.name ||
-                                  "Unknown Customer"}
-                              </h3>
-
-                              <span
-                                className={
-                                  styles.customerType
-                                }
-                              >
-                                Property Enquiry
-                              </span>
-
-                            </div>
-
-                          </div>
-
-                          <div
-                            className={
-                              styles.newBadge
-                            }
-                          >
-                            NEW
-                          </div>
-
-                        </div>
-
-                        {/* ================= CONTACT DETAILS ================= */}
-
-                        <div
-                          className={
-                            styles.contactGrid
-                          }
-                        >
-
-                          {/* PHONE */}
-
-                          <div
-                            className={
-                              styles.contactItem
-                            }
-                          >
+                            <h3>
+                              {enquiry.name ||
+                                "Unknown Customer"}
+                            </h3>
 
                             <span
                               className={
-                                styles.contactIcon
+                                styles.customerType
                               }
                             >
-                              ☎
+                              Property Enquiry
                             </span>
+                          </div>
+                        </div>
 
-                            <div>
+                        <div className={styles.newBadge}>
+                          NEW
+                        </div>
+                      </div>
 
-                              <small>
-                                PHONE
-                              </small>
+                      {/* CONTACT */}
 
+                      <div className={styles.contactGrid}>
+                        <div className={styles.contactItem}>
+                          <span
+                            className={
+                              styles.contactIcon
+                            }
+                          >
+                            ☎
+                          </span>
+
+                          <div>
+                            <small>PHONE</small>
+
+                            {enquiry.phone ? (
                               <button
+                                type="button"
                                 className={
                                   styles.contactLink
                                 }
@@ -585,240 +486,37 @@ export default function AdminEnquiries() {
                                   )
                                 }
                               >
-                                {enquiry.phone ||
-                                  "Not provided"}
+                                {enquiry.phone}
                               </button>
-
-                            </div>
-
-                          </div>
-
-                          {/* EMAIL */}
-
-                          <div
-                            className={
-                              styles.contactItem
-                            }
-                          >
-
-                            <span
-                              className={
-                                styles.contactIcon
-                              }
-                            >
-                              ✉
-                            </span>
-
-                            <div>
-
-                              <small>
-                                EMAIL
-                              </small>
-
-                              {enquiry.email ? (
-
-                                <button
-                                  className={
-                                    styles.contactLink
-                                  }
-                                  onClick={() =>
-                                    handleEmail(
-                                      enquiry.email
-                                    )
-                                  }
-                                >
-                                  {enquiry.email}
-                                </button>
-
-                              ) : (
-
-                                <span
-                                  className={
-                                    styles.notAvailable
-                                  }
-                                >
-                                  Not provided
-                                </span>
-
-                              )}
-
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                        {/* ================= PROPERTY DETAILS ================= */}
-
-                        <div
-                          className={
-                            styles.detailsSection
-                          }
-                        >
-
-                          <div
-                            className={
-                              styles.detailItem
-                            }
-                          >
-
-                            <span>
-                              PROPERTY TYPE
-                            </span>
-
-                            <strong>
-                              {enquiry.property_type ||
-                                "Not specified"}
-                            </strong>
-
-                          </div>
-
-                          <div
-                            className={
-                              styles.detailItem
-                            }
-                          >
-
-                            <span>
-                              PREFERRED LOCATION
-                            </span>
-
-                            <strong>
-                              {enquiry.preferred_location ||
-                                "Not specified"}
-                            </strong>
-
-                          </div>
-
-                          <div
-                            className={
-                              styles.detailItem
-                            }
-                          >
-
-                            <span>
-                              BUDGET
-                            </span>
-
-                            <strong>
-                              {enquiry.budget ||
-                                "Not specified"}
-                            </strong>
-
-                          </div>
-
-                          <div
-                            className={
-                              styles.detailItem
-                            }
-                          >
-
-                            <span>
-                              REQUIREMENT
-                            </span>
-
-                            <strong>
-                              {getRequirement(
-                                enquiry
-                              )}
-                            </strong>
-
-                          </div>
-
-                        </div>
-
-                        {/* ================= CUSTOMER MESSAGE ================= */}
-
-                        {message && (
-
-                          <div
-                            className={
-                              styles.messageBox
-                            }
-                          >
-
-                            <span>
-                              CUSTOMER MESSAGE
-                            </span>
-
-                            <p>
-                              “{message}”
-                            </p>
-
-                          </div>
-
-                        )}
-
-                        {/* ================= ACTIONS ================= */}
-
-                        <div
-                          className={
-                            styles.cardFooter
-                          }
-                        >
-
-                          <div
-                            className={
-                              styles.followUpText
-                            }
-                          >
-                            <span>
-                              Follow up with this
-                              customer
-                            </span>
-                          </div>
-
-                          <div
-                            className={
-                              styles.actionButtons
-                            }
-                          >
-
-                            {/* CALL */}
-
-                            <button
-                              className={
-                                styles.callButton
-                              }
-                              onClick={() =>
-                                handleCall(
-                                  enquiry.phone
-                                )
-                              }
-                            >
-                              <span>
-                                ☎
-                              </span>
-
-                              Call
-                            </button>
-
-                            {/* WHATSAPP */}
-
-                            <button
-                              className={
-                                styles.whatsappButton
-                              }
-                              onClick={() =>
-                                handleWhatsApp(
-                                  enquiry.phone
-                                )
-                              }
-                            >
-                              <span>
-                                ◉
-                              </span>
-
-                              WhatsApp
-                            </button>
-
-                            {/* EMAIL */}
-
-                            {enquiry.email && (
-
-                              <button
+                            ) : (
+                              <span
                                 className={
-                                  styles.emailButton
+                                  styles.notAvailable
+                                }
+                              >
+                                Not provided
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className={styles.contactItem}>
+                          <span
+                            className={
+                              styles.contactIcon
+                            }
+                          >
+                            ✉
+                          </span>
+
+                          <div>
+                            <small>EMAIL</small>
+
+                            {enquiry.email ? (
+                              <button
+                                type="button"
+                                className={
+                                  styles.contactLink
                                 }
                                 onClick={() =>
                                   handleEmail(
@@ -826,63 +524,152 @@ export default function AdminEnquiries() {
                                   )
                                 }
                               >
-                                <span>
-                                  ✉
-                                </span>
-
-                                Email
+                                {enquiry.email}
                               </button>
-
-                            )}
-
-                            {/* DELETE */}
-
-                            <button
-                              className={
-                                styles.deleteButton
-                              }
-                              onClick={() =>
-                                handleDeleteEnquiry(
-                                  enquiry.id
-                                )
-                              }
-                              disabled={
-                                deletingId ===
-                                enquiry.id
-                              }
-                            >
-
-                              <span>
-                                🗑
+                            ) : (
+                              <span
+                                className={
+                                  styles.notAvailable
+                                }
+                              >
+                                Not provided
                               </span>
-
-                              {deletingId ===
-                              enquiry.id
-                                ? "Deleting..."
-                                : "Delete"}
-
-                            </button>
-
+                            )}
                           </div>
+                        </div>
+                      </div>
 
+                      {/* PROPERTY DETAILS */}
+
+                      <div className={styles.detailsSection}>
+                        <div className={styles.detailItem}>
+                          <span>PROPERTY TYPE</span>
+
+                          <strong>
+                            {enquiry.property_type ||
+                              "Not specified"}
+                          </strong>
                         </div>
 
-                      </article>
+                        <div className={styles.detailItem}>
+                          <span>PREFERRED LOCATION</span>
 
-                    );
-                  }
-                )}
+                          <strong>
+                            {enquiry.preferred_location ||
+                              "Not specified"}
+                          </strong>
+                        </div>
 
+                        <div className={styles.detailItem}>
+                          <span>BUDGET</span>
+
+                          <strong>
+                            {enquiry.budget ||
+                              "Not specified"}
+                          </strong>
+                        </div>
+
+                        <div className={styles.detailItem}>
+                          <span>REQUIREMENT</span>
+
+                          <strong>
+                            {getRequirement(enquiry)}
+                          </strong>
+                        </div>
+                      </div>
+
+                      {/* MESSAGE */}
+
+                      {message && (
+                        <div className={styles.messageBox}>
+                          <span>
+                            CUSTOMER MESSAGE
+                          </span>
+
+                          <p>“{message}”</p>
+                        </div>
+                      )}
+
+                      {/* FOOTER */}
+
+                      <div className={styles.cardFooter}>
+                        <div className={styles.followUpText}>
+                          Follow up with this customer
+                        </div>
+
+                        <div className={styles.actionButtons}>
+                          <button
+                            type="button"
+                            className={styles.callButton}
+                            onClick={() =>
+                              handleCall(
+                                enquiry.phone
+                              )
+                            }
+                          >
+                            <span>☎</span>
+                            Call
+                          </button>
+
+                          <button
+                            type="button"
+                            className={
+                              styles.whatsappButton
+                            }
+                            onClick={() =>
+                              handleWhatsApp(
+                                enquiry.phone
+                              )
+                            }
+                          >
+                            <span>◉</span>
+                            WhatsApp
+                          </button>
+
+                          {enquiry.email && (
+                            <button
+                              type="button"
+                              className={styles.emailButton}
+                              onClick={() =>
+                                handleEmail(
+                                  enquiry.email
+                                )
+                              }
+                            >
+                              <span>✉</span>
+                              Email
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            className={styles.deleteButton}
+                            onClick={() =>
+                              handleDeleteEnquiry(
+                                enquiry.id
+                              )
+                            }
+                            disabled={
+                              deletingId ===
+                              enquiry.id
+                            }
+                          >
+                            <span>🗑</span>
+
+                            {deletingId === enquiry.id
+                              ? "Deleting..."
+                              : "Delete"}
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
-
             )}
-
           </section>
-
         )}
-
-      </section>
-
-    </main>
+      </main>
+    </div>
   );
 }

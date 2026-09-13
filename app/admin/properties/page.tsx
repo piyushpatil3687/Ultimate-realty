@@ -131,7 +131,7 @@ export default function AdminPropertiesPage() {
         <div style={styles.brand}>
           <div style={styles.logoCircle}>
             <img
-              src="/image/ultimate-realty-logo.png"
+              src="/images/ultimate-realty-logo.png"
               alt="Ultimate Realty"
               style={styles.logoImage}
             />
