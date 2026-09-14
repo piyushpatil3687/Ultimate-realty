@@ -1,874 +1,1257 @@
-/* =========================================================
-   ULTIMATE REALTY UR — ADMIN PROPERTIES
-   Dashboard / Reviews matching theme
-   ========================================================= */
-
 .page {
   min-height: 100vh;
   background: #f5f7fb;
   color: #172033;
-  display: flex;
+  box-sizing: border-box;
 }
 
-/* =========================================================
+/* =========================================
+   LOADING
+   ========================================= */
+
+.loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f7fb;
+}
+
+.loadingBox {
+  text-align: center;
+}
+
+.loadingLogo {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #2d3237;
+  color: white;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+}
+
+.loadingBox p {
+  margin: 0;
+  color: #687180;
+  font-size: 14px;
+}
+
+/* =========================================
    SIDEBAR
-   ========================================================= */
+   ========================================= */
 
 .sidebar {
-  width: 250px;
-  min-height: 100vh;
-  background: #ffffff;
-  border-right: 1px solid #e7eaf0;
-  display: flex;
-  flex-direction: column;
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
-  z-index: 50;
+
+  width: 250px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #2d3237;
+  color: white;
+
+  z-index: 100;
+  box-sizing: border-box;
 }
 
-/* Brand */
+/* =========================================
+   BRAND
+   ========================================= */
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 24px 20px;
-  text-decoration: none;
-  color: #172033;
-  border-bottom: 1px solid #eef0f4;
+  gap: 10px;
+
+  padding: 24px 22px 20px;
+
+  flex-shrink: 0;
 }
 
-.logoCircle {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  border-radius: 50%;
-  background: #f5f7fb;
-  border: 1px solid #e5e8ee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
+.brandLogo {
+  width: 45px;
+  height: 45px;
 
-.logoCircle img {
-  width: 100%;
-  height: 100%;
+  min-width: 45px;
+  min-height: 45px;
+
   object-fit: contain;
-  padding: 5px;
+
+  background: white;
+  border-radius: 50%;
+  padding: 3px;
+
+  box-sizing: border-box;
 }
 
-.brand h2 {
-  margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #172033;
-}
+.brandText {
+  min-width: 0;
 
-.brand span {
-  display: block;
-  margin-top: 3px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #7b8494;
-}
-
-/* Navigation */
-
-.navigation {
-  padding: 18px 12px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
 }
 
-.navigation button {
-  width: 100%;
-  border: none;
-  background: transparent;
-  color: #667085;
-  border-radius: 10px;
-  padding: 12px 14px;
+.brandText strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.brandText small {
+  margin-top: 4px;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+
+  white-space: nowrap;
+}
+
+.sidebarLabel {
+  padding: 0 22px 12px;
+
+  color: rgba(255, 255, 255, 0.35);
+
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+/* =========================================
+   NAVIGATION
+   ========================================= */
+
+.navigation {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  padding: 10px 12px;
+}
+
+.navLink {
+  min-height: 40px;
+
   display: flex;
   align-items: center;
-  gap: 12px;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+
+  gap: 10px;
+
+  padding: 0 12px;
+
+  border-radius: 6px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 11px;
+  text-decoration: none;
+
+  transition: 0.2s ease;
 }
 
-.navigation button span {
-  width: 22px;
-  text-align: center;
-  font-size: 16px;
+.navLink span {
+  width: 16px;
+
+  display: inline-flex;
+  justify-content: center;
+
+  font-size: 11px;
 }
 
-.navigation button:hover {
-  background: #f2f4f8;
-  color: #172033;
+.navLink strong {
+  font-weight: 500;
 }
 
-.navigation button:active {
-  transform: scale(0.98);
+.navLink:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: white;
 }
 
-.navigation .active {
-  background: #172033;
-  color: #ffffff;
+.active {
+  background: white;
+  color: #2d3237;
 }
 
-.navigation .active:hover {
-  background: #172033;
-  color: #ffffff;
+.active:hover {
+  background: white;
+  color: #2d3237;
 }
 
-/* Sidebar bottom */
+/* =========================================
+   SIDEBAR BOTTOM
+   ========================================= */
 
 .sidebarBottom {
   margin-top: auto;
-  padding: 16px 12px 20px;
-  border-top: 1px solid #eef0f4;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  padding: 18px 12px 20px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.backButton {
+.sidebarBottom a,
+.sidebarBottom button {
   width: 100%;
-  border: 1px solid #e3e7ed;
-  background: #ffffff;
-  color: #596273;
-  border-radius: 9px;
-  padding: 11px 12px;
-  font-size: 13px;
-  font-weight: 600;
+  min-height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 5px;
+
+  box-sizing: border-box;
+
+  font-family: inherit;
+  font-size: 10px;
+
+  text-decoration: none;
+
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.backButton:hover {
-  background: #f5f7fb;
-  color: #172033;
-  border-color: #d5dae2;
+.sidebarBottom a {
+  color: rgba(255, 255, 255, 0.65);
 }
 
-/* =========================================================
-   MAIN
-   ========================================================= */
+.sidebarBottom button {
+  border: 1px solid rgba(255, 255, 255, 0.12);
 
-.main {
-  flex: 1;
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.sidebarBottom a:hover,
+.sidebarBottom button:hover {
+  color: white;
+}
+
+/* =========================================
+   MAIN CONTENT
+   ========================================= */
+
+.content {
+  width: calc(100% - 250px);
+
   margin-left: 250px;
-  min-width: 0;
-  padding: 34px;
+
+  min-height: 100vh;
+
+  padding: 36px 40px 60px;
+
+  box-sizing: border-box;
 }
 
-/* Header */
+/* =========================================
+   TOPBAR
+   ========================================= */
 
-.header {
+.topbar {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 20px;
+
+  gap: 25px;
+
   margin-bottom: 28px;
 }
 
-.header h1 {
-  margin: 0;
-  color: #172033;
-  font-size: 30px;
-  line-height: 1.2;
+.heading p {
+  margin: 0 0 7px;
+
+  color: #7c8490;
+
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: 1.8px;
 }
 
-.header p {
-  margin: 8px 0 0;
-  max-width: 700px;
-  color: #7a8393;
-  font-size: 14px;
-  line-height: 1.6;
+.heading h1 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 32px;
+  font-weight: 750;
+
+  line-height: 1.1;
 }
 
-/* Add Property */
+.heading span {
+  display: block;
+
+  max-width: 500px;
+
+  margin-top: 8px;
+
+  color: #89919d;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
 
 .addButton {
+  min-height: 42px;
+
+  padding: 0 18px;
+
   border: none;
+  border-radius: 7px;
+
   background: #172033;
-  color: #ffffff;
-  padding: 12px 18px;
-  border-radius: 9px;
-  font-size: 13px;
+  color: white;
+
+  font-family: inherit;
+
+  font-size: 11px;
   font-weight: 700;
-  cursor: pointer;
+
   white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(23, 32, 51, 0.12);
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.addButton:hover {
+  background: #2b3548;
+  transform: translateY(-1px);
+}
+
+/* =========================================
+   MOBILE NAVIGATION
+   ========================================= */
+
+.mobileNavigation {
+  display: none;
+}
+
+/* =========================================
+   STATISTICS
+   ========================================= */
+
+.stats {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 15px;
+
+  margin-bottom: 24px;
+}
+
+.statCard {
+  min-height: 105px;
+
+  padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  background: white;
+
+  border: 1px solid #e2e4e7;
+  border-radius: 12px;
+}
+
+.statCard span {
+  margin-bottom: 8px;
+
+  color: #7c8490;
+
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.statCard strong {
+  color: #172033;
+
+  font-size: 26px;
+  line-height: 1;
+
+  font-weight: 750;
+}
+
+.statCard small {
+  margin-top: 7px;
+
+  color: #9299a4;
+
+  font-size: 10px;
+}
+
+/* =========================================
+   MAIN SECTION
+   ========================================= */
+
+.section {
+  overflow: hidden;
+
+  background: white;
+
+  border: 1px solid #e2e4e7;
+  border-radius: 14px;
+}
+
+.sectionHeading {
+  min-height: 70px;
+
+  padding: 18px 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  border-bottom: 1px solid #eceef1;
+
+  box-sizing: border-box;
+}
+
+.sectionHeading p {
+  margin: 0 0 5px;
+
+  color: #7b8490;
+
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.sectionHeading h2 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.sectionAddButton {
+  display: none;
+}
+
+/* =========================================
+   PROPERTY GRID
+   ========================================= */
+
+.propertyGrid {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 18px;
+
+  padding: 20px;
+}
+
+/* =========================================
+   PROPERTY CARD
+   ========================================= */
+
+.propertyCard {
+  min-width: 0;
+
+  overflow: hidden;
+
+  background: white;
+
+  border: 1px solid #e1e4e8;
+  border-radius: 11px;
+
+  box-sizing: border-box;
+
   transition:
-    background 0.2s ease,
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
 
-.addButton:hover {
-  background: #0f1728;
-  transform: translateY(-1px);
-  box-shadow: 0 7px 18px rgba(23, 32, 51, 0.16);
-}
-
-.addButton:active {
-  transform: translateY(0);
-}
-
-/* =========================================================
-   STATISTICS
-   ========================================================= */
-
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  margin-bottom: 26px;
-}
-
-.statCard {
-  background: #ffffff;
-  border: 1px solid #e7eaf0;
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  min-height: 92px;
-  box-shadow: 0 2px 8px rgba(23, 32, 51, 0.025);
-}
-
-.statIcon {
-  width: 46px;
-  height: 46px;
-  min-width: 46px;
-  border-radius: 10px;
-  background: #f1f3f7;
-  color: #172033;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.statCard:nth-child(2) .statIcon {
-  background: #edf7f1;
-  color: #237a49;
-}
-
-.statCard:nth-child(3) .statIcon {
-  background: #fff6e8;
-  color: #a56a12;
-}
-
-.statCard span {
-  display: block;
-  color: #7b8494;
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-
-.statCard strong {
-  display: block;
-  color: #172033;
-  font-size: 25px;
-  line-height: 1;
-  font-weight: 700;
-}
-
-/* =========================================================
-   PROPERTY SECTION
-   ========================================================= */
-
-.propertySection {
-  background: #ffffff;
-  border: 1px solid #e7eaf0;
-  border-radius: 13px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(23, 32, 51, 0.025);
-}
-
-.sectionHeader {
-  padding: 21px 23px;
-  border-bottom: 1px solid #edf0f4;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-}
-
-.sectionHeader h2 {
-  margin: 0;
-  color: #172033;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.sectionHeader p {
-  margin: 5px 0 0;
-  color: #8991a0;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-/* =========================================================
-   PROPERTY LIST
-   ========================================================= */
-
-.propertyList {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Property Card */
-
-.propertyCard {
-  display: grid;
-  grid-template-columns: 210px minmax(0, 1fr) auto;
-  gap: 20px;
-  padding: 20px 23px;
-  border-bottom: 1px solid #edf0f4;
-  transition: background 0.2s ease;
-}
-
-.propertyCard:last-child {
-  border-bottom: none;
-}
-
 .propertyCard:hover {
-  background: #fafbfc;
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 25px rgba(20, 25, 30, 0.08);
 }
 
-/* Property Image */
-
-.imageWrapper {
-  width: 210px;
-  height: 150px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #eef1f5;
-  position: relative;
-  border: 1px solid #e5e8ed;
-}
+/* =========================================
+   PROPERTY IMAGE
+   ========================================= */
 
 .propertyImage {
+  position: relative;
+
+  width: 100%;
+
+  height: 190px;
+
+  overflow: hidden;
+
+  background: #e7e8ea;
+}
+
+.propertyImage img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+
   display: block;
+
+  object-fit: cover;
 }
 
-.imagePlaceholder {
+.badge {
+  position: absolute;
+
+  top: 12px;
+  left: 12px;
+
+  padding: 6px 9px;
+
+  border-radius: 4px;
+
+  background: white;
+  color: #172033;
+
+  font-size: 8px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.noImage {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #98a1af;
-  font-size: 13px;
-  font-weight: 600;
-  text-align: center;
-  padding: 15px;
-}
 
-/* Listing badge */
-
-.listingBadge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 5px 9px;
-  border-radius: 6px;
-  background: #172033;
-  color: #ffffff;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.saleBadge {
-  background: #237a49;
-}
-
-.rentBadge {
-  background: #a56a12;
-}
-
-/* =========================================================
-   PROPERTY INFORMATION
-   ========================================================= */
-
-.propertyInfo {
-  min-width: 0;
   display: flex;
   flex-direction: column;
+
+  align-items: center;
   justify-content: center;
+
+  color: #7d8490;
 }
 
-.propertyInfo h3 {
+.noImage strong {
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: 28px;
+}
+
+.noImage span {
+  margin-top: 5px;
+
+  font-size: 9px;
+}
+
+/* =========================================
+   PROPERTY BODY
+   ========================================= */
+
+.propertyBody {
+  padding: 16px;
+}
+
+.propertyType {
   margin: 0 0 7px;
-  color: #172033;
-  font-size: 17px;
+
+  color: #a47b48;
+
+  font-size: 8px;
   font-weight: 700;
-  line-height: 1.35;
+
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.propertyBody h3 {
+  margin: 0 0 7px;
+
+  color: #172033;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  line-height: 1.25;
+
+  overflow-wrap: anywhere;
 }
 
 .location {
-  margin: 0 0 10px;
-  color: #7c8594;
-  font-size: 12px;
-  line-height: 1.4;
-}
+  min-height: 30px;
 
-.price {
-  margin: 0 0 12px;
-  color: #172033;
-  font-size: 18px;
-  font-weight: 700;
+  margin: 0;
+
+  color: #7c8490;
+
+  font-size: 10px;
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
 }
 
 .details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
+  margin: 9px 0 0;
+
+  color: #7c8490;
+
+  font-size: 9px;
+
+  overflow-wrap: anywhere;
 }
 
-.detailItem {
-  background: #f5f7fa;
-  border: 1px solid #e9ecf1;
-  color: #626c7c;
-  border-radius: 6px;
-  padding: 5px 8px;
-  font-size: 11px;
-  font-weight: 600;
+.price {
+  margin-top: 13px;
+
+  padding-top: 12px;
+
+  border-top: 1px solid #eceef1;
+
+  color: #172033;
+
+  font-size: 14px;
+  font-weight: 750;
+
+  overflow-wrap: anywhere;
 }
 
-/* =========================================================
+/* =========================================
    ACTIONS
-   ========================================================= */
+   ========================================= */
 
 .actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
   gap: 7px;
-  flex-direction: column;
-  min-width: 82px;
+
+  margin-top: 13px;
 }
 
-.viewButton,
-.editButton,
-.deleteButton {
-  width: 82px;
-  border-radius: 7px;
-  padding: 8px 10px;
-  font-size: 11px;
+.actions button {
+  min-height: 34px;
+
+  border-radius: 5px;
+
+  font-family: inherit;
+
+  font-size: 9px;
   font-weight: 700;
+
   cursor: pointer;
-  transition: all 0.2s ease;
-}
 
-.viewButton {
-  background: #f4f6f9;
-  border: 1px solid #e1e5eb;
-  color: #4e596a;
-}
-
-.viewButton:hover {
-  background: #e9edf2;
-  color: #172033;
+  transition: 0.2s ease;
 }
 
 .editButton {
-  background: #eef3fb;
-  border: 1px solid #dbe5f4;
-  color: #315f98;
+  border: 1px solid #dfe2e6;
+
+  background: white;
+
+  color: #172033;
 }
 
 .editButton:hover {
-  background: #e3ebf8;
-  color: #254f84;
+  background: #f5f6f7;
 }
 
 .deleteButton {
-  background: #fff1f1;
-  border: 1px solid #f5d5d5;
-  color: #c23b3b;
+  border: 1px solid #e0caca;
+
+  background: #fff7f7;
+
+  color: #a33d3d;
 }
 
 .deleteButton:hover {
-  background: #ffe5e5;
-  color: #a92d2d;
+  background: #fbeaea;
 }
 
-.viewButton:disabled,
-.editButton:disabled,
-.deleteButton:disabled,
-.addButton:disabled {
+.deleteButton:disabled {
   opacity: 0.55;
+
   cursor: not-allowed;
-  transform: none;
 }
 
-/* =========================================================
-   LOADING
-   ========================================================= */
-
-.loading {
-  min-height: 280px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 12px;
-  color: #7d8695;
-}
-
-.loading p {
-  margin: 0;
-  font-size: 13px;
-}
-
-.spinner {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 3px solid #e6e9ee;
-  border-top-color: #172033;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* =========================================================
+/* =========================================
    EMPTY STATE
-   ========================================================= */
+   ========================================= */
 
 .emptyState {
-  min-height: 300px;
-  padding: 40px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  padding: 65px 25px;
+
   text-align: center;
 }
 
 .emptyIcon {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
+
+  margin: 0 auto 16px;
+
+  display: grid;
+  place-items: center;
+
   border-radius: 50%;
-  background: #f1f3f6;
-  color: #7b8494;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 25px;
-  margin-bottom: 15px;
+
+  background: #f0f1f3;
+
+  color: #172033;
+
+  font-size: 22px;
 }
 
 .emptyState h3 {
-  margin: 0 0 7px;
+  margin: 0 0 8px;
+
   color: #172033;
+
   font-size: 18px;
 }
 
 .emptyState p {
-  max-width: 420px;
-  margin: 0;
-  color: #8a92a0;
-  font-size: 13px;
+  max-width: 400px;
+
+  margin: 0 auto 20px;
+
+  color: #89919d;
+
+  font-size: 11px;
+
   line-height: 1.6;
 }
 
-/* =========================================================
+/* =========================================
    ERROR
-   ========================================================= */
+   ========================================= */
 
-.errorMessage {
-  margin: 0 23px 20px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  background: #fff1f1;
-  border: 1px solid #f2d2d2;
-  color: #b33131;
+.errorBox {
+  padding: 22px;
+
+  margin-bottom: 20px;
+
+  background: #fff7f7;
+
+  border: 1px solid #e6caca;
+  border-radius: 10px;
+
+  color: #8d3838;
+}
+
+.errorBox strong {
   font-size: 13px;
 }
 
-/* =========================================================
-   RESPONSIVE — TABLET
-   ========================================================= */
+.errorBox p {
+  margin: 8px 0 14px;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.errorBox button {
+  padding: 9px 14px;
+
+  border: none;
+  border-radius: 5px;
+
+  background: #8d3838;
+  color: white;
+
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* =========================================
+   TABLET
+   ========================================= */
 
 @media (max-width: 1100px) {
   .sidebar {
-    width: 220px;
+    width: 210px;
   }
 
-  .main {
-    margin-left: 220px;
-    padding: 28px;
+  .content {
+    width: calc(100% - 210px);
+    margin-left: 210px;
+
+    padding: 28px 22px 50px;
   }
 
-  .propertyCard {
-    grid-template-columns: 180px minmax(0, 1fr) auto;
-    gap: 16px;
+  .propertyGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
 
-  .imageWrapper {
+/* =========================================
+   TABLET / SMALL SCREEN
+   ========================================= */
+
+@media (max-width: 800px) {
+  .sidebar {
     width: 180px;
-    height: 135px;
-  }
-}
-
-/* =========================================================
-   RESPONSIVE — SMALL TABLET
-   ========================================================= */
-
-@media (max-width: 900px) {
-  .sidebar {
-    width: 205px;
   }
 
-  .main {
-    margin-left: 205px;
-    padding: 24px;
-  }
+  .content {
+    width: calc(100% - 180px);
+    margin-left: 180px;
 
-  .statsGrid {
-    gap: 12px;
-  }
-
-  .statCard {
-    padding: 16px;
-  }
-
-  .propertyCard {
-    grid-template-columns: 150px minmax(0, 1fr);
-  }
-
-  .imageWrapper {
-    width: 150px;
-    height: 125px;
-  }
-
-  .actions {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    justify-content: flex-end;
-    min-width: auto;
-  }
-
-  .viewButton,
-  .editButton,
-  .deleteButton {
-    width: auto;
-    min-width: 80px;
-  }
-}
-
-/* =========================================================
-   RESPONSIVE — MOBILE
-   ========================================================= */
-
-@media (max-width: 700px) {
-  .page {
-    display: block;
-  }
-
-  .sidebar {
-    position: relative;
-    width: 100%;
-    min-height: auto;
-    border-right: none;
-    border-bottom: 1px solid #e7eaf0;
+    padding: 25px 18px 45px;
   }
 
   .brand {
-    padding: 16px 18px;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .sidebarLabel {
+    padding-left: 15px;
   }
 
   .navigation {
-    flex-direction: row;
-    overflow-x: auto;
-    padding: 10px 12px;
-    gap: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
-  .navigation button {
-    width: auto;
-    min-width: max-content;
-    padding: 10px 12px;
+  .propertyGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 650px) {
+  .page {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Hide desktop sidebar completely */
+  .sidebar {
+    position: static;
+
+    width: 100%;
+    min-height: auto;
+
+    display: block;
+
+    background: #2d3237;
+  }
+
+  .brand {
+    min-height: 64px;
+
+    padding: 10px 14px;
+
+    justify-content: flex-start;
+  }
+
+  .brandLogo {
+    width: 38px;
+    height: 38px;
+
+    min-width: 38px;
+    min-height: 38px;
+  }
+
+  .brandText strong {
     font-size: 12px;
   }
 
-  .navigation button span {
-    display: none;
+  .brandText small {
+    font-size: 6px;
   }
 
+  .sidebarLabel,
+  .navigation,
   .sidebarBottom {
     display: none;
   }
 
-  .main {
+  /* Main content becomes full width */
+  .content {
+    width: 100%;
     margin-left: 0;
-    padding: 20px 16px 30px;
+
+    padding: 16px 14px 35px;
+
+    box-sizing: border-box;
   }
 
-  .header {
+  .topbar {
     flex-direction: column;
-    margin-bottom: 20px;
+
+    gap: 15px;
+
+    margin-bottom: 15px;
   }
 
-  .header h1 {
-    font-size: 25px;
+  .heading p {
+    font-size: 8px;
+  }
+
+  .heading h1 {
+    font-size: 26px;
+  }
+
+  .heading span {
+    max-width: 100%;
+
+    font-size: 10px;
   }
 
   .addButton {
     width: 100%;
+
+    min-height: 42px;
   }
 
-  .statsGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .statCard {
-    min-height: 75px;
-  }
-
-  .propertySection {
-    border-radius: 10px;
-  }
-
-  .sectionHeader {
-    padding: 17px;
-  }
-
-  .propertyCard {
-    grid-template-columns: 1fr;
-    padding: 17px;
-  }
-
-  .imageWrapper {
+  /* Show mobile navigation */
+  .mobileNavigation {
     width: 100%;
-    height: 190px;
+
+    display: grid;
+
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    gap: 5px;
+
+    margin-bottom: 16px;
+
+    padding: 5px;
+
+    background: white;
+
+    border: 1px solid #e2e4e7;
+    border-radius: 9px;
+
+    box-sizing: border-box;
   }
 
-  .propertyInfo h3 {
-    font-size: 16px;
+  .mobileNavigation a {
+    min-width: 0;
+    min-height: 44px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 3px;
+
+    border-radius: 6px;
+
+    color: #727b88;
+
+    font-size: 8px;
+    font-weight: 600;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    overflow: hidden;
   }
 
-  .actions {
-    justify-content: stretch;
-    width: 100%;
-  }
-
-  .viewButton,
-  .editButton,
-  .deleteButton {
-    flex: 1;
-  }
-}
-
-/* =========================================================
-   RESPONSIVE — SMALL MOBILE
-   ========================================================= */
-
-@media (max-width: 430px) {
-  .main {
-    padding: 16px 12px 25px;
-  }
-
-  .brand {
-    padding: 14px;
-  }
-
-  .logoCircle {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-  }
-
-  .brand h2 {
-    font-size: 13px;
-  }
-
-  .brand span {
-    font-size: 9px;
-  }
-
-  .navigation {
-    padding: 8px;
-  }
-
-  .navigation button {
-    padding: 9px 10px;
-    font-size: 11px;
-  }
-
-  .header h1 {
-    font-size: 22px;
-  }
-
-  .header p {
+  .mobileNavigation a span {
     font-size: 12px;
   }
 
-  .sectionHeader h2 {
-    font-size: 16px;
+  .mobileNavigation .mobileActive {
+    background: #172033;
+
+    color: white;
   }
 
-  .sectionHeader p {
-    font-size: 11px;
+  /* Stats */
+
+  .stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 7px;
+
+    margin-bottom: 16px;
   }
 
-  .propertyCard {
+  .statCard {
+    min-height: 85px;
+
+    padding: 10px;
+  }
+
+  .statCard span {
+    font-size: 6px;
+
+    letter-spacing: 0.7px;
+
+    line-height: 1.3;
+  }
+
+  .statCard strong {
+    font-size: 20px;
+  }
+
+  .statCard small {
+    display: none;
+  }
+
+  /* Section */
+
+  .section {
+    border-radius: 10px;
+  }
+
+  .sectionHeading {
+    min-height: 62px;
+
     padding: 14px;
   }
 
-  .imageWrapper {
-    height: 165px;
+  .sectionHeading p {
+    font-size: 7px;
   }
 
-  .price {
+  .sectionHeading h2 {
     font-size: 16px;
   }
 
-  .details {
-    gap: 5px;
+  .sectionAddButton {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 32px;
+
+    padding: 0 10px;
+
+    border: 1px solid #dfe2e6;
+    border-radius: 5px;
+
+    background: white;
+    color: #172033;
+
+    font-family: inherit;
+    font-size: 8px;
+    font-weight: 700;
   }
 
-  .detailItem {
-    font-size: 10px;
-    padding: 4px 6px;
+  /* Property cards */
+
+  .propertyGrid {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+
+    padding: 12px;
+  }
+
+  .propertyCard {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 38% 62%;
+
+    align-items: stretch;
+  }
+
+  .propertyImage {
+    height: 100%;
+    min-height: 155px;
+  }
+
+  .propertyBody {
+    min-width: 0;
+
+    padding: 12px;
+  }
+
+  .propertyType {
+    margin-bottom: 5px;
+
+    font-size: 7px;
+  }
+
+  .propertyBody h3 {
+    margin-bottom: 5px;
+
+    font-size: 13px;
+  }
+
+  .location {
+    min-height: auto;
+
+    font-size: 8px;
+  }
+
+  .details {
+    margin-top: 6px;
+
+    font-size: 8px;
+  }
+
+  .price {
+    margin-top: 9px;
+
+    padding-top: 9px;
+
+    font-size: 12px;
   }
 
   .actions {
-    flex-wrap: wrap;
+    gap: 5px;
+
+    margin-top: 9px;
   }
 
-  .viewButton,
-  .editButton,
-  .deleteButton {
-    min-width: 70px;
-    font-size: 10px;
-    padding: 7px 8px;
+  .actions button {
+    min-height: 30px;
+
+    font-size: 8px;
+  }
+
+  .badge {
+    top: 7px;
+    left: 7px;
+
+    padding: 4px 5px;
+
+    font-size: 6px;
+  }
+}
+
+/* =========================================
+   VERY SMALL PHONES
+   ========================================= */
+
+@media (max-width: 380px) {
+  .content {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .brand {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .brandLogo {
+    width: 35px;
+    height: 35px;
+
+    min-width: 35px;
+    min-height: 35px;
+  }
+
+  .brandText strong {
+    font-size: 11px;
+  }
+
+  .heading h1 {
+    font-size: 24px;
+  }
+
+  .heading span {
+    font-size: 9px;
+  }
+
+  .mobileNavigation {
+    gap: 3px;
+    padding: 4px;
+  }
+
+  .mobileNavigation a {
+    min-height: 42px;
+
+    font-size: 7px;
+  }
+
+  .mobileNavigation a span {
+    font-size: 11px;
+  }
+
+  .stats {
+    gap: 5px;
+  }
+
+  .statCard {
+    min-height: 78px;
+
+    padding: 8px;
+  }
+
+  .statCard span {
+    font-size: 5.5px;
+  }
+
+  .statCard strong {
+    font-size: 18px;
+  }
+
+  .propertyGrid {
+    padding: 8px;
+  }
+
+  .propertyCard {
+    grid-template-columns: 36% 64%;
+  }
+
+  .propertyImage {
+    min-height: 145px;
+  }
+
+  .propertyBody {
+    padding: 10px;
+  }
+
+  .propertyBody h3 {
+    font-size: 12px;
+  }
+
+  .location,
+  .details {
+    font-size: 7px;
+  }
+
+  .price {
+    font-size: 11px;
+  }
+
+  .actions button {
+    min-height: 28px;
+
+    font-size: 7px;
   }
 }
