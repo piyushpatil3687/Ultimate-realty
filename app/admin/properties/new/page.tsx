@@ -70,6 +70,9 @@ const amenitiesList = [
   "Visitor Parking",
 ];
 
+const MAX_IMAGE_WIDTH = 1800;
+const IMAGE_QUALITY = 0.82;
+
 export default function AddPropertyPage() {
   const router = useRouter();
 
@@ -79,17 +82,19 @@ export default function AddPropertyPage() {
   const [propertyType, setPropertyType] = useState("");
   const [listingType, setListingType] = useState("");
 
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>(
+    []
+  );
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
-  const [uploadingImages, setUploadingImages] = useState(false);
-
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
-  const [uploadingVideo, setUploadingVideo] = useState(false);
+
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState("");
 
   const [saving, setSaving] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [uploadProgress, setUploadProgress] = useState("");
 
   /* --------------------------------
      AUTH CHECK
@@ -109,6 +114,40 @@ export default function AddPropertyPage() {
 
     checkUser();
   }, [router]);
+
+  /* --------------------------------
+     IMAGE PREVIEWS
+  -------------------------------- */
+
+  useEffect(() => {
+    const urls = selectedImages.map((file) =>
+      URL.createObjectURL(file)
+    );
+
+    setImagePreviewUrls(urls);
+
+    return () => {
+      urls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [selectedImages]);
+
+  /* --------------------------------
+     VIDEO PREVIEW
+  -------------------------------- */
+
+  useEffect(() => {
+    if (!selectedVideo) {
+      setVideoPreviewUrl("");
+      return;
+    }
+
+    const url = URL.createObjectURL(selectedVideo);
+    setVideoPreviewUrl(url);
+
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [selectedVideo]);
 
   /* --------------------------------
      FORM CHANGE
@@ -154,89 +193,30 @@ export default function AddPropertyPage() {
       return;
     }
 
+    const validImages = files.filter((file) =>
+      ["image/jpeg", "image/png", "image/webp"].includes(file.type)
+    );
+
+    if (validImages.length !== files.length) {
+      alert("Only JPG, PNG and WEBP images are allowed.");
+    }
+
     setSelectedImages((previous) => [
       ...previous,
-      ...files,
+      ...validImages,
     ]);
 
     event.target.value = "";
   };
 
   /* --------------------------------
-     REMOVE SELECTED IMAGE
+     REMOVE IMAGE
   -------------------------------- */
 
   const removeSelectedImage = (index: number) => {
     setSelectedImages((previous) =>
       previous.filter((_, imageIndex) => imageIndex !== index)
     );
-  };
-
-  /* --------------------------------
-     UPLOAD IMAGES
-  -------------------------------- */
-
-  const uploadImageFiles = async (files: File[]) => {
-    if (files.length === 0) {
-      return [];
-    }
-
-    const imageUrls: string[] = [];
-
-    for (const image of files) {
-      const fileExtension =
-        image.name.split(".").pop()?.toLowerCase() || "jpg";
-
-      const fileName = `${crypto.randomUUID()}.${fileExtension}`;
-
-      const filePath = `properties/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("property-images")
-        .upload(filePath, image);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data } = supabase.storage
-        .from("property-images")
-        .getPublicUrl(filePath);
-
-      imageUrls.push(data.publicUrl);
-    }
-
-    return imageUrls;
-  };
-
-  const uploadImages = async () => {
-    if (selectedImages.length === 0) {
-      alert("Please select at least one image.");
-      return;
-    }
-
-    setUploadingImages(true);
-
-    try {
-      const imageUrls = await uploadImageFiles(selectedImages);
-
-      setUploadedImageUrls((previous) => [
-        ...previous,
-        ...imageUrls,
-      ]);
-
-      setSelectedImages([]);
-
-      alert("Images uploaded successfully.");
-    } catch (error) {
-      console.error("Image upload error:", error);
-
-      alert(
-        "Image upload failed. Please check your Supabase Storage settings."
-      );
-    } finally {
-      setUploadingImages(false);
-    }
   };
 
   /* --------------------------------
@@ -248,41 +228,196 @@ export default function AddPropertyPage() {
   ) => {
     const file = event.target.files?.[0] || null;
 
+    if (!file) {
+      return;
+    }
+
+    if (
+      file.type !== "video/mp4" &&
+      file.type !== "video/webm"
+    ) {
+      alert("Please select an MP4 or WEBM video.");
+      event.target.value = "";
+      return;
+    }
+
     setSelectedVideo(file);
 
     event.target.value = "";
   };
 
   /* --------------------------------
-     UPLOAD VIDEO
+     COMPRESS IMAGE
   -------------------------------- */
 
-  const uploadVideoFile = async (file: File) => {
-    setUploadingVideo(true);
+  const compressImage = async (file: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      const objectUrl = URL.createObjectURL(file);
 
-    try {
-      const fileExtension =
-        file.name.split(".").pop()?.toLowerCase() || "mp4";
+      image.onload = () => {
+        URL.revokeObjectURL(objectUrl);
 
-      const fileName = `${crypto.randomUUID()}.${fileExtension}`;
+        let width = image.naturalWidth;
+        let height = image.naturalHeight;
 
-      const filePath = `properties/${fileName}`;
+        if (width > MAX_IMAGE_WIDTH) {
+          const ratio = MAX_IMAGE_WIDTH / width;
+
+          width = MAX_IMAGE_WIDTH;
+          height = Math.round(height * ratio);
+        }
+
+        const canvas = document.createElement("canvas");
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const context = canvas.getContext("2d");
+
+        if (!context) {
+          reject(new Error("Could not prepare image compression."));
+          return;
+        }
+
+        context.drawImage(image, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error("Image compression failed."));
+              return;
+            }
+
+            resolve(blob);
+          },
+          "image/jpeg",
+          IMAGE_QUALITY
+        );
+      };
+
+      image.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error(`Could not read image: ${file.name}`));
+      };
+
+      image.src = objectUrl;
+    });
+  };
+
+  /* --------------------------------
+     UPLOAD IMAGES
+  -------------------------------- */
+
+  const uploadImageFiles = async (
+    files: File[],
+    propertyId: string
+  ) => {
+    const imageUrls: string[] = [];
+    const uploadedPaths: string[] = [];
+
+    for (let index = 0; index < files.length; index++) {
+      const image = files[index];
+
+      setUploadProgress(
+        `Uploading photo ${index + 1} of ${files.length}...`
+      );
+
+      const compressedImage = await compressImage(image);
+
+      const fileName = `${crypto.randomUUID()}.jpg`;
+      const filePath = `properties/${propertyId}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from("property-videos")
-        .upload(filePath, file);
+        .from("property-images")
+        .upload(filePath, compressedImage, {
+          contentType: "image/jpeg",
+          cacheControl: "31536000",
+          upsert: false,
+        });
 
       if (uploadError) {
         throw uploadError;
       }
 
+      uploadedPaths.push(filePath);
+
       const { data } = supabase.storage
-        .from("property-videos")
+        .from("property-images")
         .getPublicUrl(filePath);
 
-      return data.publicUrl;
-    } finally {
-      setUploadingVideo(false);
+      imageUrls.push(data.publicUrl);
+    }
+
+    return {
+      imageUrls,
+      uploadedPaths,
+    };
+  };
+
+  /* --------------------------------
+     UPLOAD VIDEO
+  -------------------------------- */
+
+  const uploadVideoFile = async (
+    file: File,
+    propertyId: string
+  ) => {
+    setUploadProgress("Uploading property video...");
+
+    const fileExtension =
+      file.name.split(".").pop()?.toLowerCase() || "mp4";
+
+    const fileName = `${crypto.randomUUID()}.${fileExtension}`;
+    const filePath = `properties/${propertyId}/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("property-videos")
+      .upload(filePath, file, {
+        contentType: file.type,
+        cacheControl: "31536000",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage
+      .from("property-videos")
+      .getPublicUrl(filePath);
+
+    return {
+      videoUrl: data.publicUrl,
+      uploadedPath: filePath,
+    };
+  };
+
+  /* --------------------------------
+     DELETE UPLOADED FILES IF SAVE FAILS
+  -------------------------------- */
+
+  const cleanupUploadedFiles = async (
+    imagePaths: string[],
+    videoPaths: string[]
+  ) => {
+    try {
+      if (imagePaths.length > 0) {
+        await supabase.storage
+          .from("property-images")
+          .remove(imagePaths);
+      }
+
+      if (videoPaths.length > 0) {
+        await supabase.storage
+          .from("property-videos")
+          .remove(videoPaths);
+      }
+    } catch (cleanupError) {
+      console.error(
+        "Storage cleanup error:",
+        cleanupError
+      );
     }
   };
 
@@ -298,6 +433,8 @@ export default function AddPropertyPage() {
     if (saving) {
       return;
     }
+
+    /* BASIC VALIDATION */
 
     if (!formData.title.trim()) {
       alert("Please enter the property title.");
@@ -329,7 +466,21 @@ export default function AddPropertyPage() {
       return;
     }
 
+    if (selectedImages.length === 0) {
+      const continueWithoutImage = window.confirm(
+        "No property photos are selected.\n\nDo you want to save this property without photos?"
+      );
+
+      if (!continueWithoutImage) {
+        return;
+      }
+    }
+
     setSaving(true);
+    setUploadProgress("Checking admin session...");
+
+    const uploadedImagePaths: string[] = [];
+    const uploadedVideoPaths: string[] = [];
 
     try {
       /* -----------------------------
@@ -340,7 +491,9 @@ export default function AddPropertyPage() {
         await supabase.auth.getUser();
 
       if (userError || !userData.user) {
-        alert("Your admin session has expired. Please login again.");
+        alert(
+          "Your admin session has expired. Please login again."
+        );
 
         router.replace("/admin/login");
         return;
@@ -353,9 +506,52 @@ export default function AddPropertyPage() {
       const propertyId = crypto.randomUUID();
 
       /* -----------------------------
-         CREATE PROPERTY FIRST
-         WITH EMPTY MEDIA ARRAYS
+         UPLOAD IMAGES FIRST
       ----------------------------- */
+
+      let finalImageUrls: string[] = [];
+
+      if (selectedImages.length > 0) {
+        const imageResult = await uploadImageFiles(
+          selectedImages,
+          propertyId
+        );
+
+        finalImageUrls = imageResult.imageUrls;
+
+        uploadedImagePaths.push(
+          ...imageResult.uploadedPaths
+        );
+      }
+
+      /* -----------------------------
+         VIDEO
+      ----------------------------- */
+
+      const finalVideoUrls: string[] = [];
+
+      if (selectedVideo) {
+        const videoResult = await uploadVideoFile(
+          selectedVideo,
+          propertyId
+        );
+
+        finalVideoUrls.push(videoResult.videoUrl);
+
+        uploadedVideoPaths.push(
+          videoResult.uploadedPath
+        );
+      } else if (formData.video_url.trim()) {
+        finalVideoUrls.push(
+          formData.video_url.trim()
+        );
+      }
+
+      /* -----------------------------
+         SAVE COMPLETE PROPERTY
+      ----------------------------- */
+
+      setUploadProgress("Saving property details...");
 
       const propertyPayload = {
         id: propertyId,
@@ -384,7 +580,8 @@ export default function AddPropertyPage() {
 
         total_floors: formData.total_floors,
 
-        furnishing_status: formData.furnishing_status,
+        furnishing_status:
+          formData.furnishing_status,
 
         carpet_area: formData.carpet_area,
 
@@ -394,9 +591,11 @@ export default function AddPropertyPage() {
 
         pincode: formData.pincode,
 
-        complete_address: formData.complete_address,
+        complete_address:
+          formData.complete_address,
 
-        google_maps_url: formData.google_maps_url,
+        google_maps_url:
+          formData.google_maps_url,
 
         latitude: formData.latitude
           ? Number(formData.latitude)
@@ -406,13 +605,13 @@ export default function AddPropertyPage() {
           ? Number(formData.longitude)
           : null,
 
-        description: formData.description,
+        description: formData.description.trim(),
 
         amenities: selectedAmenities,
 
-        images: [],
+        images: finalImageUrls,
 
-        videos: [],
+        videos: finalVideoUrls,
 
         updated_at: new Date().toISOString(),
       };
@@ -422,82 +621,34 @@ export default function AddPropertyPage() {
         .insert(propertyPayload);
 
       if (insertError) {
-        console.error(
-          "Property insert error:",
-          insertError
-        );
-
         throw insertError;
-      }
-
-      /* -----------------------------
-         UPLOAD REMAINING SELECTED IMAGES
-      ----------------------------- */
-
-      let finalImageUrls = [...uploadedImageUrls];
-
-      if (selectedImages.length > 0) {
-        const newImageUrls = await uploadImageFiles(
-          selectedImages
-        );
-
-        finalImageUrls = [
-          ...finalImageUrls,
-          ...newImageUrls,
-        ];
-      }
-
-      /* -----------------------------
-         VIDEO
-      ----------------------------- */
-
-      const finalVideoUrls: string[] = [];
-
-      if (selectedVideo) {
-        const videoUrl = await uploadVideoFile(
-          selectedVideo
-        );
-
-        finalVideoUrls.push(videoUrl);
-      } else if (formData.video_url.trim()) {
-        finalVideoUrls.push(
-          formData.video_url.trim()
-        );
-      }
-
-      /* -----------------------------
-         UPDATE PROPERTY WITH MEDIA
-      ----------------------------- */
-
-      const { error: updateError } = await supabase
-        .from("properties")
-        .update({
-          images: finalImageUrls,
-          videos: finalVideoUrls,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", propertyId);
-
-      if (updateError) {
-        console.error(
-          "Property media update error:",
-          updateError
-        );
-
-        throw updateError;
       }
 
       /* -----------------------------
          SUCCESS
       ----------------------------- */
 
-      alert("Property saved successfully! 🎉");
+      setUploadProgress("Property saved successfully.");
+
+      alert(
+        "Property saved successfully! 🎉\n\nThe property is now available in your Properties section."
+      );
 
       router.push("/admin/properties");
 
       router.refresh();
     } catch (error) {
-      console.error("Save property error:", error);
+      console.error(
+        "Save property error:",
+        error
+      );
+
+      /* Remove files if database save failed */
+
+      await cleanupUploadedFiles(
+        uploadedImagePaths,
+        uploadedVideoPaths
+      );
 
       const message =
         error instanceof Error
@@ -509,6 +660,7 @@ export default function AddPropertyPage() {
       );
     } finally {
       setSaving(false);
+      setUploadProgress("");
     }
   };
 
@@ -548,7 +700,6 @@ export default function AddPropertyPage() {
 
   return (
     <main className={styles.propertyPage}>
-
       {/* HEADER */}
 
       <header className={styles.propertyHeader}>
@@ -560,8 +711,9 @@ export default function AddPropertyPage() {
           <h1>Add New Property</h1>
 
           <p className={styles.headerDescription}>
-            Create a complete property listing with details,
-            media and location information.
+            Create a complete property listing with
+            details, photos, video and location
+            information.
           </p>
         </div>
 
@@ -569,6 +721,7 @@ export default function AddPropertyPage() {
           type="button"
           className={styles.backLink}
           onClick={handleCancel}
+          disabled={saving}
         >
           ← Properties
         </button>
@@ -580,11 +733,9 @@ export default function AddPropertyPage() {
         className={styles.propertyForm}
         onSubmit={handleSaveProperty}
       >
-
         {/* 01 BASIC INFORMATION */}
 
         <section className={styles.propertySection}>
-
           <div className={styles.sectionHeading}>
             <span>01</span>
 
@@ -592,13 +743,13 @@ export default function AddPropertyPage() {
               <h2>Basic Information</h2>
 
               <p>
-                Enter the main information about this property.
+                Enter the main information about this
+                property.
               </p>
             </div>
           </div>
 
           <div className={styles.formGrid}>
-
             <div
               className={`${styles.formGroup} ${styles.fullWidth}`}
             >
@@ -611,11 +762,11 @@ export default function AddPropertyPage() {
                 onChange={handleChange}
                 placeholder="Example: Premium 3 BHK Apartment in Ravet"
                 required
+                disabled={saving}
               />
             </div>
 
             <div className={styles.formGroup}>
-
               <label>Property Type *</label>
 
               <select
@@ -624,6 +775,7 @@ export default function AddPropertyPage() {
                   setPropertyType(e.target.value)
                 }
                 required
+                disabled={saving}
               >
                 <option value="">
                   Select property type
@@ -649,11 +801,9 @@ export default function AddPropertyPage() {
 
                 <option value="Other">Other</option>
               </select>
-
             </div>
 
             <div className={styles.formGroup}>
-
               <label>Listing Type *</label>
 
               <select
@@ -662,6 +812,7 @@ export default function AddPropertyPage() {
                   setListingType(e.target.value)
                 }
                 required
+                disabled={saving}
               >
                 <option value="">
                   Select listing type
@@ -675,11 +826,9 @@ export default function AddPropertyPage() {
                   For Rent
                 </option>
               </select>
-
             </div>
 
             <div className={styles.formGroup}>
-
               <label>Price *</label>
 
               <input
@@ -689,18 +838,18 @@ export default function AddPropertyPage() {
                 onChange={handleChange}
                 placeholder="Example: ₹85 Lakh"
                 required
+                disabled={saving}
               />
-
             </div>
 
             <div className={styles.formGroup}>
-
               <label>BHK</label>
 
               <select
                 name="bhk"
                 value={formData.bhk}
                 onChange={handleChange}
+                disabled={saving}
               >
                 <option value="">
                   Select BHK
@@ -718,16 +867,13 @@ export default function AddPropertyPage() {
 
                 <option value="Other">Other</option>
               </select>
-
             </div>
-
           </div>
         </section>
 
         {/* 02 PROPERTY DETAILS */}
 
         <section className={styles.propertySection}>
-
           <div className={styles.sectionHeading}>
             <span>02</span>
 
@@ -741,7 +887,6 @@ export default function AddPropertyPage() {
           </div>
 
           <div className={styles.formGrid}>
-
             <div className={styles.formGroup}>
               <label>Bedrooms</label>
 
@@ -751,6 +896,7 @@ export default function AddPropertyPage() {
                 value={formData.bedrooms}
                 onChange={handleChange}
                 placeholder="Example: 3"
+                disabled={saving}
               />
             </div>
 
@@ -763,6 +909,7 @@ export default function AddPropertyPage() {
                 value={formData.bathrooms}
                 onChange={handleChange}
                 placeholder="Example: 2"
+                disabled={saving}
               />
             </div>
 
@@ -775,6 +922,7 @@ export default function AddPropertyPage() {
                 value={formData.balconies}
                 onChange={handleChange}
                 placeholder="Example: 2"
+                disabled={saving}
               />
             </div>
 
@@ -787,6 +935,7 @@ export default function AddPropertyPage() {
                 value={formData.floor}
                 onChange={handleChange}
                 placeholder="Example: 8th Floor"
+                disabled={saving}
               />
             </div>
 
@@ -799,17 +948,18 @@ export default function AddPropertyPage() {
                 value={formData.total_floors}
                 onChange={handleChange}
                 placeholder="Example: 15"
+                disabled={saving}
               />
             </div>
 
             <div className={styles.formGroup}>
-
               <label>Furnishing Status</label>
 
               <select
                 name="furnishing_status"
                 value={formData.furnishing_status}
                 onChange={handleChange}
+                disabled={saving}
               >
                 <option value="">
                   Select status
@@ -827,7 +977,6 @@ export default function AddPropertyPage() {
                   Fully Furnished
                 </option>
               </select>
-
             </div>
 
             <div className={styles.formGroup}>
@@ -839,6 +988,7 @@ export default function AddPropertyPage() {
                 value={formData.carpet_area}
                 onChange={handleChange}
                 placeholder="Example: 1200 sq.ft"
+                disabled={saving}
               />
             </div>
 
@@ -851,6 +1001,7 @@ export default function AddPropertyPage() {
                 value={formData.built_up_area}
                 onChange={handleChange}
                 placeholder="Example: 1450 sq.ft"
+                disabled={saving}
               />
             </div>
 
@@ -863,16 +1014,15 @@ export default function AddPropertyPage() {
                 value={formData.plot_area}
                 onChange={handleChange}
                 placeholder="Example: 2000 sq.ft"
+                disabled={saving}
               />
             </div>
-
           </div>
         </section>
 
         {/* 03 LOCATION */}
 
         <section className={styles.propertySection}>
-
           <div className={styles.sectionHeading}>
             <span>03</span>
 
@@ -880,15 +1030,14 @@ export default function AddPropertyPage() {
               <h2>Location</h2>
 
               <p>
-                Provide the property's location information.
+                Provide the property's location
+                information.
               </p>
             </div>
           </div>
 
           <div className={styles.formGrid}>
-
             <div className={styles.formGroup}>
-
               <label>Locality *</label>
 
               <input
@@ -898,12 +1047,11 @@ export default function AddPropertyPage() {
                 onChange={handleChange}
                 placeholder="Example: Ravet"
                 required
+                disabled={saving}
               />
-
             </div>
 
             <div className={styles.formGroup}>
-
               <label>City *</label>
 
               <input
@@ -913,12 +1061,11 @@ export default function AddPropertyPage() {
                 onChange={handleChange}
                 placeholder="Example: Pune"
                 required
+                disabled={saving}
               />
-
             </div>
 
             <div className={styles.formGroup}>
-
               <label>Pincode</label>
 
               <input
@@ -927,14 +1074,13 @@ export default function AddPropertyPage() {
                 value={formData.pincode}
                 onChange={handleChange}
                 placeholder="Example: 412101"
+                disabled={saving}
               />
-
             </div>
 
             <div
               className={`${styles.formGroup} ${styles.fullWidth}`}
             >
-
               <label>Complete Address</label>
 
               <textarea
@@ -943,14 +1089,13 @@ export default function AddPropertyPage() {
                 value={formData.complete_address}
                 onChange={handleChange}
                 placeholder="Enter complete property address..."
+                disabled={saving}
               />
-
             </div>
 
             <div
               className={`${styles.formGroup} ${styles.fullWidth}`}
             >
-
               <label>Google Maps URL</label>
 
               <input
@@ -959,12 +1104,11 @@ export default function AddPropertyPage() {
                 value={formData.google_maps_url}
                 onChange={handleChange}
                 placeholder="Paste Google Maps location URL"
+                disabled={saving}
               />
-
             </div>
 
             <div className={styles.formGroup}>
-
               <label>Latitude</label>
 
               <input
@@ -973,12 +1117,11 @@ export default function AddPropertyPage() {
                 value={formData.latitude}
                 onChange={handleChange}
                 placeholder="Example: 18.6500"
+                disabled={saving}
               />
-
             </div>
 
             <div className={styles.formGroup}>
-
               <label>Longitude</label>
 
               <input
@@ -987,17 +1130,15 @@ export default function AddPropertyPage() {
                 value={formData.longitude}
                 onChange={handleChange}
                 placeholder="Example: 73.7500"
+                disabled={saving}
               />
-
             </div>
-
           </div>
         </section>
 
         {/* 04 DESCRIPTION */}
 
         <section className={styles.propertySection}>
-
           <div className={styles.sectionHeading}>
             <span>04</span>
 
@@ -1005,28 +1146,27 @@ export default function AddPropertyPage() {
               <h2>Description</h2>
 
               <p>
-                Write complete information about the property.
+                Write complete information about the
+                property.
               </p>
             </div>
           </div>
 
           <div className={styles.formGroup}>
-
             <textarea
               name="description"
               rows={8}
               value={formData.description}
               onChange={handleChange}
               placeholder="Describe the property, nearby locations, connectivity, special features and other important information..."
+              disabled={saving}
             />
-
           </div>
         </section>
 
         {/* 05 AMENITIES */}
 
         <section className={styles.propertySection}>
-
           <div className={styles.sectionHeading}>
             <span>05</span>
 
@@ -1034,20 +1174,18 @@ export default function AddPropertyPage() {
               <h2>Amenities</h2>
 
               <p>
-                Select all amenities available at the property.
+                Select all amenities available at the
+                property.
               </p>
             </div>
           </div>
 
           <div className={styles.amenitiesGrid}>
-
             {amenitiesList.map((amenity) => (
-
               <label
                 key={amenity}
                 className={styles.amenityItem}
               >
-
                 <input
                   type="checkbox"
                   value={amenity}
@@ -1057,21 +1195,18 @@ export default function AddPropertyPage() {
                   onChange={() =>
                     handleAmenityChange(amenity)
                   }
+                  disabled={saving}
                 />
 
                 <span>{amenity}</span>
-
               </label>
-
             ))}
-
           </div>
         </section>
 
         {/* 06 PROPERTY PHOTOS */}
 
         <section className={styles.propertySection}>
-
           <div className={styles.sectionHeading}>
             <span>06</span>
 
@@ -1079,13 +1214,14 @@ export default function AddPropertyPage() {
               <h2>Property Photos</h2>
 
               <p>
-                Upload multiple high-quality photos of the property.
+                Upload multiple photos. Images are
+                automatically optimized before upload to
+                improve website loading speed.
               </p>
             </div>
           </div>
 
           <div className={styles.uploadBox}>
-
             <div className={styles.uploadIcon}>
               +
             </div>
@@ -1095,11 +1231,11 @@ export default function AddPropertyPage() {
             </h3>
 
             <p>
-              JPG, PNG or WEBP · Multiple images allowed
+              JPG, PNG or WEBP · Multiple images
+              allowed
             </p>
 
             <label className={styles.uploadButton}>
-
               Choose Photos
 
               <input
@@ -1107,99 +1243,80 @@ export default function AddPropertyPage() {
                 accept="image/jpeg,image/png,image/webp"
                 multiple
                 onChange={handleImageSelect}
+                disabled={saving}
               />
-
             </label>
-
           </div>
 
           {/* IMAGE PREVIEW */}
 
           {selectedImages.length > 0 && (
-
-            <div className={styles.imagePreviewGrid}>
-
-              {selectedImages.map(
-                (image, index) => (
-
-                  <div
-                    key={`${image.name}-${index}`}
-                    className={styles.imagePreview}
-                  >
-
-                    <img
-                      src={URL.createObjectURL(image)}
-                      alt={`Property preview ${index + 1}`}
-                    />
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        removeSelectedImage(index)
-                      }
-                      className={
-                        styles.removeImageButton
-                      }
+            <>
+              <div className={styles.imagePreviewGrid}>
+                {selectedImages.map(
+                  (image, index) => (
+                    <div
+                      key={`${image.name}-${image.lastModified}-${index}`}
+                      className={styles.imagePreview}
                     >
-                      ×
-                    </button>
+                      <img
+                        src={
+                          imagePreviewUrls[index]
+                        }
+                        alt={`Property preview ${
+                          index + 1
+                        }`}
+                      />
 
-                    <div className={styles.imageName}>
-                      {image.name}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeSelectedImage(
+                            index
+                          )
+                        }
+                        className={
+                          styles.removeImageButton
+                        }
+                        disabled={saving}
+                      >
+                        ×
+                      </button>
+
+                      <div
+                        className={
+                          styles.imageName
+                        }
+                      >
+                        {image.name}
+                      </div>
                     </div>
+                  )
+                )}
+              </div>
 
-                  </div>
-
-                )
-              )}
-
-            </div>
+              <p
+                style={{
+                  marginTop: "12px",
+                  fontSize: "14px",
+                  opacity: 0.75,
+                }}
+              >
+                {selectedImages.length} photo
+                {selectedImages.length !== 1
+                  ? "s"
+                  : ""}{" "}
+                selected. All photos will be
+                optimized automatically when you
+                save the property.
+              </p>
+            </>
           )}
-
-          {/* UPLOAD BUTTON */}
-
-          {selectedImages.length > 0 && (
-
-            <button
-              type="button"
-              onClick={uploadImages}
-              disabled={uploadingImages || saving}
-              className={styles.uploadImagesButton}
-            >
-
-              {uploadingImages
-                ? "Uploading..."
-                : `Upload ${selectedImages.length} Photo${
-                    selectedImages.length > 1
-                      ? "s"
-                      : ""
-                  }`}
-
-            </button>
-
-          )}
-
-          {/* SUCCESS */}
-
-          {uploadedImageUrls.length > 0 && (
-
-            <div className={styles.uploadSuccess}>
-
-              ✓ {uploadedImageUrls.length} photo
-              {uploadedImageUrls.length > 1
-                ? "s"
-                : ""} uploaded successfully
-
-            </div>
-
-          )}
-
         </section>
 
         {/* 07 PROPERTY VIDEO */}
 
         <section className={styles.propertySection}>
-
           <div className={styles.sectionHeading}>
             <span>07</span>
 
@@ -1207,13 +1324,13 @@ export default function AddPropertyPage() {
               <h2>Property Video</h2>
 
               <p>
-                Upload a property video or provide a video URL.
+                Upload a property video or provide a
+                video URL.
               </p>
             </div>
           </div>
 
           <div className={styles.uploadBox}>
-
             <div className={styles.uploadIcon}>
               +
             </div>
@@ -1227,36 +1344,60 @@ export default function AddPropertyPage() {
             </p>
 
             <label className={styles.uploadButton}>
-
               Choose Video
 
               <input
                 type="file"
                 accept="video/mp4,video/webm"
                 onChange={handleVideoSelect}
+                disabled={saving}
               />
-
             </label>
 
             {selectedVideo && (
-
               <p
                 style={{
                   marginTop: "12px",
                   fontSize: "14px",
                 }}
               >
-                Selected: {selectedVideo.name}
+                Selected:{" "}
+                {selectedVideo.name}
               </p>
-
             )}
 
+            {/* VIDEO PREVIEW */}
+
+            {videoPreviewUrl && (
+              <div
+                style={{
+                  marginTop: "20px",
+                  width: "100%",
+                  maxWidth: "720px",
+                }}
+              >
+                <video
+                  src={videoPreviewUrl}
+                  controls
+                  preload="metadata"
+                  style={{
+                    width: "100%",
+                    maxHeight: "420px",
+                    borderRadius: "12px",
+                    display: "block",
+                    background: "#111",
+                  }}
+                >
+                  Your browser does not support
+                  video playback.
+                </video>
+              </div>
+            )}
           </div>
 
           <div
             className={`${styles.formGroup} ${styles.videoUrl}`}
           >
-
             <label>
               Or Video URL
             </label>
@@ -1266,17 +1407,47 @@ export default function AddPropertyPage() {
               name="video_url"
               value={formData.video_url}
               onChange={handleChange}
-              placeholder="YouTube or video URL"
+              placeholder="YouTube or direct video URL"
+              disabled={saving}
             />
-
           </div>
-
         </section>
+
+        {/* SAVE PROGRESS */}
+
+        {saving && uploadProgress && (
+          <div
+            style={{
+              marginTop: "20px",
+              padding: "16px 20px",
+              borderRadius: "12px",
+              background: "#f3f6f8",
+              border: "1px solid #e1e6ea",
+              fontSize: "15px",
+              fontWeight: 600,
+            }}
+          >
+            ⏳ {uploadProgress}
+            <br />
+
+            <span
+              style={{
+                display: "block",
+                marginTop: "6px",
+                fontSize: "13px",
+                fontWeight: 400,
+                opacity: 0.7,
+              }}
+            >
+              Please keep this page open until the
+              property is saved.
+            </span>
+          </div>
+        )}
 
         {/* ACTIONS */}
 
         <div className={styles.propertyActions}>
-
           <button
             type="button"
             className={styles.cancelButton}
@@ -1291,15 +1462,11 @@ export default function AddPropertyPage() {
             className={styles.saveButton}
             disabled={saving}
           >
-
             {saving
               ? "Saving Property..."
               : "Save Property →"}
-
           </button>
-
         </div>
-
       </form>
     </main>
   );
